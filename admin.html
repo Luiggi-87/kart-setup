@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Kart Setup</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --bg-card: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: #1f2937;
+      --danger: #f97373;
+      --info: #38bdf8;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+    body {
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      visibility: hidden;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 16px; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand h1 { color: var(--accent); font-size: 24px; }
+    .brand .badge { background: var(--accent-soft); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+
+    .user-section { display: flex; align-items: center; gap: 12px; }
+    .user-section span { color: var(--text-soft); }
+    #btn-logout { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; }
+    #btn-logout:hover { opacity: 0.9; }
+
+    .navbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-soft);
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: 0.2s;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .nav-btn:hover { color: var(--text); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-card .label { color: var(--text-soft); font-size: 12px; margin-bottom: 8px; }
+    .stat-card .value { color: var(--accent); font-size: 32px; font-weight: bold; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    th {
+      background: var(--bg-soft);
+      padding: 12px;
+      text-align: left;
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .email { color: var(--accent); }
+    .role { background: var(--accent-soft); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .status.active { background: rgba(34, 197, 94, 0.2); color: var(--accent); }
+    .status.inactive { background: rgba(249, 115, 115, 0.2); color: var(--danger); }
+
+    .actions { display: flex; gap: 8px; }
+    .btn-sm {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .btn-sm:hover { background: var(--border); }
+    .btn-sm.danger { color: var(--danger); border-color: var(--danger); }
+    .btn-sm.danger:hover { background: rgba(249, 115, 115, 0.1); }
+
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-soft);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    // Guard imediato: apenas admin
+    (async function adminGuard() {
+      const SUPABASE_URL = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
+
+      let attempts = 0;
+      while (!window.supabase && attempts < 50) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+
+      if (!window.supabase) {
+        window.location.replace('/login.html');
+        return;
+      }
+
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { session } } = await sb.auth.getSession();
+
+      if (!session) {
+        window.location.replace('/login.html');
+        return;
+      }
+
+      const { data: profile } = await sb.from('profiles')
+        .select('role, email').eq('id', session.user.id).single();
+
+      if (profile?.role !== 'admin') {
+        window.location.replace('/app.html');
+        return;
+      }
+
+      window._supabase = sb;
+      window._currentUser = { id: session.user.id, email: profile.email, role: 'admin' };
+      document.body.style.visibility = 'visible';
+      initAdmin();
+    })();
+  </script>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>🛠️ Admin</h1>
+        <span class="badge">Painel de Administração</span>
+      </div>
+      <div class="user-section">
+        <span id="user-email"></span>
+        <button id="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <div class="navbar">
+      <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn" data-tab="usuarios">Usuários</button>
+      <button class="nav-btn" data-tab="assinaturas">Assinaturas</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Total de Usuários</div>
+          <div class="value" id="stat-total-users">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Assinaturas Ativas</div>
+          <div class="value" id="stat-active-subs">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Em Trial</div>
+          <div class="value" id="stat-trial-subs">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Setups Registrados</div>
+          <div class="value" id="stat-total-setups">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUÁRIOS -->
+    <div id="panel-usuarios" class="panel">
+      <div id="usuarios-content" class="loading">Carregando usuários...</div>
+    </div>
+
+    <!-- ASSINATURAS -->
+    <div id="panel-assinaturas" class="panel">
+      <div id="assinaturas-content" class="loading">Carregando assinaturas...</div>
+    </div>
+  </div>
+
+  <script>
+    const sb = () => window._supabase;
+
+    function initAdmin() {
+      document.getElementById('user-email').textContent = window._currentUser.email;
+
+      document.getElementById('btn-logout').addEventListener('click', async () => {
+        await sb().auth.signOut();
+        window.location.replace('/login.html');
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+
+          if (btn.dataset.tab === 'usuarios') loadUsuarios();
+          if (btn.dataset.tab === 'assinaturas') loadAssinaturas();
+          if (btn.dataset.tab === 'dashboard') loadDashboard();
+        });
+      });
+
+      loadDashboard();
+    }
+
+    async function loadDashboard() {
+      const { data: allProfiles } = await sb().from('profiles').select('id, subscription_status, trial_ends_at, current_period_end');
+      const { data: allSetups } = await sb().from('setups').select('id');
+
+      const now = new Date();
+      const activeCount = allProfiles.filter(p => {
+        if (p.subscription_status !== 'active') return false;
+        const endDate = new Date(p.current_period_end);
+        return endDate > now;
+      }).length;
+
+      const trialCount = allProfiles.filter(p => {
+        if (p.subscription_status !== 'trial') return false;
+        const endDate = new Date(p.trial_ends_at);
+        return endDate > now;
+      }).length;
+
+      document.getElementById('stat-total-users').textContent = allProfiles?.length || 0;
+      document.getElementById('stat-active-subs').textContent = activeCount;
+      document.getElementById('stat-trial-subs').textContent = trialCount;
+      document.getElementById('stat-total-setups').textContent = allSetups?.length || 0;
+    }
+
+    async function loadUsuarios() {
+      const { data: users, error } = await sb().from('profiles').select('*').order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('usuarios-content').innerHTML = `<div class="empty">Erro ao carregar usuários</div>`;
+        return;
+      }
+
+      if (!users || users.length === 0) {
+        document.getElementById('usuarios-content').innerHTML = `<div class="empty">Nenhum usuário encontrado</div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status Assinatura</th>
+              <th>Data Criação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      users.forEach(user => {
+        const subStatus = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
+        const subStatusClass = user.subscription_status === 'active' || user.subscription_status === 'trial' ? 'active' : 'inactive';
+        const createdAt = new Date(user.created_at).toLocaleDateString('pt-BR');
+
+        html += `
+          <tr>
+            <td class="email">${user.email}</td>
+            <td><span class="role">${user.role}</span></td>
+            <td><span class="status ${subStatusClass}">${subStatus}</span></td>
+            <td>${createdAt}</td>
+            <td class="actions">
+              <button class="btn-sm" onclick="changeRole('${user.id}', '${user.role}')">
+                ${user.role === 'admin' ? 'Remover Admin' : 'Fazer Admin'}
+              </button>
+              <button class="btn-sm danger" onclick="deleteUser('${user.id}', '${user.email}')">Deletar</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('usuarios-content').innerHTML = html;
+    }
+
+    async function loadAssinaturas() {
+      const { data: users, error } = await sb().from('profiles')
+        .select('id, email, subscription_status, trial_ends_at, current_period_end')
+        .order('created_at', { ascending: false });
+
+      if (error || !users || users.length === 0) {
+        document.getElementById('assinaturas-content').innerHTML = `<div class="empty">Nenhuma assinatura encontrada</div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Data Vencimento</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      users.forEach(user => {
+        const status = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
+        const endDate = user.subscription_status === 'trial' ? user.trial_ends_at : user.current_period_end;
+        const endDateStr = endDate ? new Date(endDate).toLocaleDateString('pt-BR') : '—';
+
+        html += `
+          <tr>
+            <td class="email">${user.email}</td>
+            <td><span class="status ${user.subscription_status === 'inactive' ? 'inactive' : 'active'}">${status}</span></td>
+            <td>${endDateStr}</td>
+            <td class="actions">
+              <button class="btn-sm" onclick="activateUser('${user.id}')">Ativar</button>
+              <button class="btn-sm danger" onclick="cancelSub('${user.id}')">Cancelar</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('assinaturas-content').innerHTML = html;
+    }
+
+    async function changeRole(userId, currentRole) {
+      const newRole = currentRole === 'admin' ? 'user' : 'admin';
+      if (!confirm(`Deseja ${newRole === 'admin' ? 'promover para admin' : 'remover privilégios de admin'}?`)) return;
+
+      const { error } = await sb().from('profiles').update({ role: newRole }).eq('id', userId);
+      if (error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        loadUsuarios();
+      }
+    }
+
+    async function deleteUser(userId, email) {
+      if (!confirm(`⚠️ Deletar permanentemente ${email}? Esta ação não pode ser desfeita.`)) return;
+
+      const { error } = await sb().from('profiles').delete().eq('id', userId);
+      if (error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        loadUsuarios();
+        loadDashboard();
+      }
+    }
+
+    async function activateUser(userId) {
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+
+      const { error } = await sb().from('profiles').update({
+        subscription_status: 'active',
+        current_period_end: endDate.toISOString()
+      }).eq('id', userId);
+
+      if (error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        loadAssinaturas();
+        loadDashboard();
+      }
+    }
+
+    async function cancelSub(userId) {
+      if (!confirm('Deseja cancelar a assinatura?')) return;
+
+      const { error } = await sb().from('profiles').update({
+        subscription_status: 'cancelled'
+      }).eq('id', userId);
+
+      if (error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        loadAssinaturas();
+        loadDashboard();
+      }
+    }
+  </script>
+</body>
+</html>

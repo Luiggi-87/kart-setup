@@ -7,6 +7,8 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id                   UUID        REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email                TEXT        NOT NULL,
+  role                 TEXT        NOT NULL DEFAULT 'user',
+  -- Valores: 'user' | 'admin'
   subscription_status  TEXT        NOT NULL DEFAULT 'inactive',
   -- Valores: 'inactive' | 'trial' | 'active' | 'cancelled'
   subscription_id      TEXT,       -- ID da pre-approval no Mercado Pago
@@ -29,6 +31,30 @@ CREATE POLICY "Users can view own profile"
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE
   USING (auth.uid() = id);
+
+-- Admin pode ver todos os usuários
+CREATE POLICY "Admins view all profiles"
+  ON public.profiles FOR SELECT
+  USING (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+  );
+
+-- Admin pode atualizar dados de qualquer usuário
+CREATE POLICY "Admins update any profile"
+  ON public.profiles FOR UPDATE
+  USING (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+  )
+  WITH CHECK (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+  );
+
+-- Admin pode deletar usuários
+CREATE POLICY "Admins delete users"
+  ON public.profiles FOR DELETE
+  USING (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+  );
 
 -- 3. Trigger: cria profile automaticamente ao fazer signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()

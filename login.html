@@ -361,7 +361,8 @@
       const isInTrial = profile?.subscription_status === 'trial'   && new Date(profile.trial_ends_at) > now;
 
       if (isActive || isInTrial) {
-        window.location.href = 'app.html';
+        const redirectUrl = profile?.role === 'admin' ? 'admin.html' : 'app.html';
+        window.location.href = redirectUrl;
         return;
       }
 
@@ -415,7 +416,9 @@
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
       if (session && !params.get('expired')) {
-        window.location.replace('app.html');
+        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        const redirectUrl = profile?.role === 'admin' ? 'admin.html' : 'app.html';
+        window.location.replace(redirectUrl);
       }
     })();
   </script>

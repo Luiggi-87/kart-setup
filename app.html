@@ -368,6 +368,7 @@
         <span class="chip">Modo: <strong>Engenharia</strong></span>
         <div class="user-info" id="user-info" style="display:none;">
           <span class="user-email" id="user-email-display"></span>
+          <button class="btn secondary" id="btn-admin" style="padding:5px 10px;font-size:11px;display:none;margin-right:8px;">🛠️ Admin</button>
           <button class="btn secondary" id="btn-logout" style="padding:5px 10px;font-size:11px;">Sair</button>
         </div>
       </div>
@@ -765,7 +766,13 @@
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.replace('/login.html'); return; }
 
-      window._currentUser = { id: session.user.id, email: session.user.email };
+      const { data: userProfile } = await sb.from('profiles')
+        .select('role').eq('id', session.user.id).single();
+      window._currentUser = {
+        id: session.user.id,
+        email: session.user.email,
+        role: userProfile?.role || 'user'
+      };
 
       const { data: profile } = await sb.from('profiles')
         .select('subscription_status, current_period_end, trial_ends_at, email')
@@ -790,6 +797,14 @@
       if (profile) {
         document.getElementById('user-info').style.display = 'flex';
         document.getElementById('user-email-display').textContent = profile.email || session.user.email;
+
+        // Mostrar botão admin se for admin
+        if (window._currentUser.role === 'admin') {
+          document.getElementById('btn-admin').style.display = 'block';
+          document.getElementById('btn-admin').addEventListener('click', () => {
+            window.location.href = '/admin.html';
+          });
+        }
       }
 
       document.getElementById('btn-logout').addEventListener('click', async () => {
