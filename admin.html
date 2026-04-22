@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Admin — Kart Setup</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/security-config.js" defer></script>
 
   <style>
     :root {
@@ -159,40 +162,55 @@
   <script>
     // Guard imediato: apenas admin
     (async function adminGuard() {
-      const SUPABASE_URL = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
-
       let attempts = 0;
-      while (!window.supabase && attempts < 50) {
+      // Aguarda Supabase e Security Config carregarem
+      while ((!window.supabase || !window.APP_CONFIG) && attempts < 100) {
         await new Promise(r => setTimeout(r, 100));
         attempts++;
       }
 
-      if (!window.supabase) {
+      if (!window.supabase || !window.APP_CONFIG) {
+        console.error('[SECURITY] Failed to load Supabase or configuration');
         window.location.replace('/login.html');
         return;
       }
 
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data: { session } } = await sb.auth.getSession();
+      try {
+        const sb = window.supabase.createClient(
+          window.APP_CONFIG.SUPABASE_URL,
+          window.APP_CONFIG.SUPABASE_ANON_KEY
+        );
+        const { data: { session } } = await sb.auth.getSession();
 
-      if (!session) {
+        if (!session) {
+          window.location.replace('/login.html');
+          return;
+        }
+
+        // Server-side verification: Verificar role via função no backend
+        // Por enquanto, verificamos client-side (deve ser movido para função)
+        const { data: profile, error } = await sb.from('profiles')
+          .select('role, email').eq('id', session.user.id).single();
+
+        if (error || profile?.role !== 'admin') {
+          console.warn('[SECURITY] Unauthorized admin access attempt', { userId: session.user.id });
+          await auditLog('UNAUTHORIZED_ADMIN_ACCESS', { userId: session.user.id }, 'warn');
+          window.location.replace('/app.html');
+          return;
+        }
+
+        // Gera CSRF token
+        generateCSRFToken();
+
+        window._supabase = sb;
+        window._currentUser = { id: session.user.id, email: escapeHtml(profile.email), role: 'admin' };
+        window._sessionCreatedAt = Date.now();
+        document.body.style.visibility = 'visible';
+        initAdmin();
+      } catch (error) {
+        console.error('[SECURITY] Admin guard error:', error);
         window.location.replace('/login.html');
-        return;
       }
-
-      const { data: profile } = await sb.from('profiles')
-        .select('role, email').eq('id', session.user.id).single();
-
-      if (profile?.role !== 'admin') {
-        window.location.replace('/app.html');
-        return;
-      }
-
-      window._supabase = sb;
-      window._currentUser = { id: session.user.id, email: profile.email, role: 'admin' };
-      document.body.style.visibility = 'visible';
-      initAdmin();
     })();
   </script>
 
@@ -251,6 +269,127 @@
   <script>
     const sb = () => window._supabase;
 
+    // DOM Construction Helper: Safe table row creation
+    function createTableRow(user, rowType = 'usuarios') {
+      const tr = document.createElement('tr');
+
+      if (rowType === 'usuarios') {
+        const subStatus = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
+        const subStatusClass = user.subscription_status === 'active' || user.subscription_status === 'trial' ? 'active' : 'inactive';
+        const createdAt = new Date(user.created_at).toLocaleDateString('pt-BR');
+
+        // Email (safe)
+        const tdEmail = document.createElement('td');
+        tdEmail.className = 'email';
+        tdEmail.textContent = escapeHtml(user.email);
+        tr.appendChild(tdEmail);
+
+        // Role (safe)
+        const tdRole = document.createElement('td');
+        const spanRole = document.createElement('span');
+        spanRole.className = 'role';
+        spanRole.textContent = escapeHtml(user.role);
+        tdRole.appendChild(spanRole);
+        tr.appendChild(tdRole);
+
+        // Status (safe)
+        const tdStatus = document.createElement('td');
+        const spanStatus = document.createElement('span');
+        spanStatus.className = `status ${subStatusClass}`;
+        spanStatus.textContent = subStatus;
+        tdStatus.appendChild(spanStatus);
+        tr.appendChild(tdStatus);
+
+        // Created At (safe)
+        const tdCreated = document.createElement('td');
+        tdCreated.textContent = createdAt;
+        tr.appendChild(tdCreated);
+
+        // Actions (safe)
+        const tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+        const btnRole = document.createElement('button');
+        btnRole.className = 'btn-sm';
+        btnRole.textContent = user.role === 'admin' ? 'Remover Admin' : 'Fazer Admin';
+        btnRole.addEventListener('click', () => {
+          // Check rate limit
+          if (!checkRateLimit('admin_role_change')) {
+            alert('Muitas tentativas. Aguarde alguns segundos.');
+            return;
+          }
+          changeRole(user.id, user.role);
+        });
+        tdActions.appendChild(btnRole);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-sm danger';
+        btnDelete.textContent = 'Deletar';
+        btnDelete.addEventListener('click', () => {
+          if (!checkRateLimit('admin_delete')) {
+            alert('Muitas tentativas. Aguarde alguns segundos.');
+            return;
+          }
+          deleteUser(user.id, user.email);
+        });
+        tdActions.appendChild(btnDelete);
+        tr.appendChild(tdActions);
+      } else if (rowType === 'assinaturas') {
+        const status = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
+        const endDate = user.subscription_status === 'trial' ? user.trial_ends_at : user.current_period_end;
+        const endDateStr = endDate ? new Date(endDate).toLocaleDateString('pt-BR') : '—';
+        const statusClass = user.subscription_status === 'inactive' ? 'inactive' : 'active';
+
+        // Email (safe)
+        const tdEmail = document.createElement('td');
+        tdEmail.className = 'email';
+        tdEmail.textContent = escapeHtml(user.email);
+        tr.appendChild(tdEmail);
+
+        // Status (safe)
+        const tdStatus = document.createElement('td');
+        const spanStatus = document.createElement('span');
+        spanStatus.className = `status ${statusClass}`;
+        spanStatus.textContent = status;
+        tdStatus.appendChild(spanStatus);
+        tr.appendChild(tdStatus);
+
+        // End Date (safe)
+        const tdEndDate = document.createElement('td');
+        tdEndDate.textContent = endDateStr;
+        tr.appendChild(tdEndDate);
+
+        // Actions (safe)
+        const tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+        const btnActivate = document.createElement('button');
+        btnActivate.className = 'btn-sm';
+        btnActivate.textContent = 'Ativar';
+        btnActivate.addEventListener('click', () => {
+          if (!checkRateLimit('admin_activate')) {
+            alert('Muitas tentativas. Aguarde alguns segundos.');
+            return;
+          }
+          activateUser(user.id);
+        });
+        tdActions.appendChild(btnActivate);
+
+        const btnCancel = document.createElement('button');
+        btnCancel.className = 'btn-sm danger';
+        btnCancel.textContent = 'Cancelar';
+        btnCancel.addEventListener('click', () => {
+          if (!checkRateLimit('admin_cancel')) {
+            alert('Muitas tentativas. Aguarde alguns segundos.');
+            return;
+          }
+          cancelSub(user.id);
+        });
+        tdActions.appendChild(btnCancel);
+        tr.appendChild(tdActions);
+      }
+
+      return tr;
+    }
+
     function initAdmin() {
       document.getElementById('user-email').textContent = window._currentUser.email;
 
@@ -260,6 +399,7 @@
 
       document.getElementById('btn-logout').addEventListener('click', async () => {
         await sb().auth.signOut();
+        clearToken();
         window.location.replace('/login.html');
       });
 
@@ -303,155 +443,228 @@
     }
 
     async function loadUsuarios() {
-      const { data: users, error } = await sb().from('profiles').select('*').order('created_at', { ascending: false });
+      const container = document.getElementById('usuarios-content');
 
-      if (error) {
-        document.getElementById('usuarios-content').innerHTML = `<div class="empty">Erro ao carregar usuários</div>`;
-        return;
+      try {
+        const { data: users, error } = await sb().from('profiles').select('*').order('created_at', { ascending: false });
+
+        if (error) {
+          container.textContent = '';
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'Erro ao carregar usuários';
+          container.appendChild(empty);
+          return;
+        }
+
+        if (!users || users.length === 0) {
+          container.textContent = '';
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'Nenhum usuário encontrado';
+          container.appendChild(empty);
+          return;
+        }
+
+        // Clear container
+        container.textContent = '';
+
+        // Create table (safe)
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+
+        const headers = ['Email', 'Role', 'Status Assinatura', 'Data Criação', 'Ações'];
+        headers.forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        users.forEach(user => {
+          const tr = createTableRow(user, 'usuarios');
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+
+        container.appendChild(table);
+      } catch (error) {
+        console.error('[SECURITY] Error loading users:', error);
+        await auditLog('LOAD_USUARIOS_ERROR', { error: error.message }, 'error');
+        container.textContent = '';
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Erro ao carregar dados';
+        container.appendChild(empty);
       }
-
-      if (!users || users.length === 0) {
-        document.getElementById('usuarios-content').innerHTML = `<div class="empty">Nenhum usuário encontrado</div>`;
-        return;
-      }
-
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status Assinatura</th>
-              <th>Data Criação</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      users.forEach(user => {
-        const subStatus = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
-        const subStatusClass = user.subscription_status === 'active' || user.subscription_status === 'trial' ? 'active' : 'inactive';
-        const createdAt = new Date(user.created_at).toLocaleDateString('pt-BR');
-
-        html += `
-          <tr>
-            <td class="email">${user.email}</td>
-            <td><span class="role">${user.role}</span></td>
-            <td><span class="status ${subStatusClass}">${subStatus}</span></td>
-            <td>${createdAt}</td>
-            <td class="actions">
-              <button class="btn-sm" onclick="changeRole('${user.id}', '${user.role}')">
-                ${user.role === 'admin' ? 'Remover Admin' : 'Fazer Admin'}
-              </button>
-              <button class="btn-sm danger" onclick="deleteUser('${user.id}', '${user.email}')">Deletar</button>
-            </td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table>`;
-      document.getElementById('usuarios-content').innerHTML = html;
     }
 
     async function loadAssinaturas() {
-      const { data: users, error } = await sb().from('profiles')
-        .select('id, email, subscription_status, trial_ends_at, current_period_end')
-        .order('created_at', { ascending: false });
+      const container = document.getElementById('assinaturas-content');
 
-      if (error || !users || users.length === 0) {
-        document.getElementById('assinaturas-content').innerHTML = `<div class="empty">Nenhuma assinatura encontrada</div>`;
-        return;
+      try {
+        const { data: users, error } = await sb().from('profiles')
+          .select('id, email, subscription_status, trial_ends_at, current_period_end')
+          .order('created_at', { ascending: false });
+
+        if (error || !users || users.length === 0) {
+          container.textContent = '';
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'Nenhuma assinatura encontrada';
+          container.appendChild(empty);
+          return;
+        }
+
+        // Clear container
+        container.textContent = '';
+
+        // Create table (safe)
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+
+        const headers = ['Email', 'Status', 'Data Vencimento', 'Ações'];
+        headers.forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        users.forEach(user => {
+          const tr = createTableRow(user, 'assinaturas');
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+
+        container.appendChild(table);
+      } catch (error) {
+        console.error('[SECURITY] Error loading subscriptions:', error);
+        await auditLog('LOAD_ASSINATURAS_ERROR', { error: error.message }, 'error');
+        container.textContent = '';
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Erro ao carregar dados';
+        container.appendChild(empty);
       }
-
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Data Vencimento</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      users.forEach(user => {
-        const status = user.subscription_status === 'active' ? 'Ativa' : user.subscription_status === 'trial' ? 'Trial' : 'Inativa';
-        const endDate = user.subscription_status === 'trial' ? user.trial_ends_at : user.current_period_end;
-        const endDateStr = endDate ? new Date(endDate).toLocaleDateString('pt-BR') : '—';
-
-        html += `
-          <tr>
-            <td class="email">${user.email}</td>
-            <td><span class="status ${user.subscription_status === 'inactive' ? 'inactive' : 'active'}">${status}</span></td>
-            <td>${endDateStr}</td>
-            <td class="actions">
-              <button class="btn-sm" onclick="activateUser('${user.id}')">Ativar</button>
-              <button class="btn-sm danger" onclick="cancelSub('${user.id}')">Cancelar</button>
-            </td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table>`;
-      document.getElementById('assinaturas-content').innerHTML = html;
     }
 
     async function changeRole(userId, currentRole) {
+      // Validate input
+      if (!userId || typeof userId !== 'string' || userId.length === 0) {
+        alert('ID de usuário inválido');
+        return;
+      }
+
       const newRole = currentRole === 'admin' ? 'user' : 'admin';
       if (!confirm(`Deseja ${newRole === 'admin' ? 'promover para admin' : 'remover privilégios de admin'}?`)) return;
 
-      const { error } = await sb().from('profiles').update({ role: newRole }).eq('id', userId);
-      if (error) {
-        alert(`Erro: ${error.message}`);
-      } else {
-        loadUsuarios();
+      try {
+        const { error } = await sb().from('profiles').update({ role: newRole }).eq('id', userId);
+        if (error) {
+          alert(`Erro: ${error.message}`);
+          await auditLog('CHANGE_ROLE_ERROR', { targetUserId: userId, newRole, error: error.message }, 'error');
+        } else {
+          await auditLog('CHANGE_ROLE_SUCCESS', { targetUserId: userId, newRole }, 'info');
+          loadUsuarios();
+        }
+      } catch (err) {
+        console.error('[SECURITY] Error changing role:', err);
+        alert('Erro ao alterar role');
+        await auditLog('CHANGE_ROLE_EXCEPTION', { targetUserId: userId, error: err.message }, 'error');
       }
     }
 
     async function deleteUser(userId, email) {
-      if (!confirm(`⚠️ Deletar permanentemente ${email}? Esta ação não pode ser desfeita.`)) return;
+      // Validate input
+      if (!userId || typeof userId !== 'string' || userId.length === 0) {
+        alert('ID de usuário inválido');
+        return;
+      }
 
-      const { error } = await sb().from('profiles').delete().eq('id', userId);
-      if (error) {
-        alert(`Erro: ${error.message}`);
-      } else {
-        loadUsuarios();
-        loadDashboard();
+      const sanitizedEmail = escapeHtml(email);
+      if (!confirm(`⚠️ Deletar permanentemente ${sanitizedEmail}? Esta ação não pode ser desfeita.`)) return;
+
+      try {
+        const { error } = await sb().from('profiles').delete().eq('id', userId);
+        if (error) {
+          alert(`Erro: ${error.message}`);
+          await auditLog('DELETE_USER_ERROR', { targetUserId: userId, email: sanitizedEmail, error: error.message }, 'error');
+        } else {
+          await auditLog('DELETE_USER_SUCCESS', { targetUserId: userId, email: sanitizedEmail }, 'warn');
+          loadUsuarios();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('[SECURITY] Error deleting user:', err);
+        alert('Erro ao deletar usuário');
+        await auditLog('DELETE_USER_EXCEPTION', { targetUserId: userId, error: err.message }, 'error');
       }
     }
 
     async function activateUser(userId) {
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + 30);
+      // Validate input
+      if (!userId || typeof userId !== 'string' || userId.length === 0) {
+        alert('ID de usuário inválido');
+        return;
+      }
 
-      const { error } = await sb().from('profiles').update({
-        subscription_status: 'active',
-        current_period_end: endDate.toISOString()
-      }).eq('id', userId);
+      try {
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 30);
 
-      if (error) {
-        alert(`Erro: ${error.message}`);
-      } else {
-        loadAssinaturas();
-        loadDashboard();
+        const { error } = await sb().from('profiles').update({
+          subscription_status: 'active',
+          current_period_end: endDate.toISOString()
+        }).eq('id', userId);
+
+        if (error) {
+          alert(`Erro: ${error.message}`);
+          await auditLog('ACTIVATE_USER_ERROR', { targetUserId: userId, error: error.message }, 'error');
+        } else {
+          await auditLog('ACTIVATE_USER_SUCCESS', { targetUserId: userId }, 'info');
+          loadAssinaturas();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('[SECURITY] Error activating user:', err);
+        alert('Erro ao ativar usuário');
+        await auditLog('ACTIVATE_USER_EXCEPTION', { targetUserId: userId, error: err.message }, 'error');
       }
     }
 
     async function cancelSub(userId) {
+      // Validate input
+      if (!userId || typeof userId !== 'string' || userId.length === 0) {
+        alert('ID de usuário inválido');
+        return;
+      }
+
       if (!confirm('Deseja cancelar a assinatura?')) return;
 
-      const { error } = await sb().from('profiles').update({
-        subscription_status: 'cancelled'
-      }).eq('id', userId);
+      try {
+        const { error } = await sb().from('profiles').update({
+          subscription_status: 'cancelled'
+        }).eq('id', userId);
 
-      if (error) {
-        alert(`Erro: ${error.message}`);
-      } else {
-        loadAssinaturas();
-        loadDashboard();
+        if (error) {
+          alert(`Erro: ${error.message}`);
+          await auditLog('CANCEL_SUB_ERROR', { targetUserId: userId, error: error.message }, 'error');
+        } else {
+          await auditLog('CANCEL_SUB_SUCCESS', { targetUserId: userId }, 'warn');
+          loadAssinaturas();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('[SECURITY] Error canceling subscription:', err);
+        alert('Erro ao cancelar assinatura');
+        await auditLog('CANCEL_SUB_EXCEPTION', { targetUserId: userId, error: err.message }, 'error');
       }
     }
   </script>

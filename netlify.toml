@@ -52,30 +52,66 @@
   to   = "/.netlify/functions/mp-webhook"
   status = 200
 
-# Cabeçalhos de segurança para o app
+# Security headers: All pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent clicking in iframes
+    X-Frame-Options = "DENY"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Enable XSS Protection (older browsers)
+    X-XSS-Protection = "1; mode=block"
+    # Enforce HTTPS for 1 year (31536000 seconds)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # Content Security Policy - STRICT
+    Content-Security-Policy = "default-src 'self'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://gkjxmsexixrjrvpwidvx.supabase.co https://api.mercadopago.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    # Referrer policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Permissions policy (formerly Feature-Policy)
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Enhanced security for app.html
 [[headers]]
   for = "/app.html"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
 
+# Enhanced security for login.html
 [[headers]]
   for = "/login.html"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
 
+# Enhanced security for admin.html
 [[headers]]
   for = "/admin.html"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
 
-# CORS para as functions
+# Enhanced security for password reset pages
+[[headers]]
+  for = "/reset-password*.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
+
+# CORS para as functions - strict CORS headers
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Authorization, Content-Type"
+    Access-Control-Allow-Headers = "Authorization, Content-Type, X-CSRF-Token"
+    Access-Control-Allow-Origin = "https://kartsetup.com.br"
+    Access-Control-Max-Age = "3600"
+    Access-Control-Allow-Credentials = "true"
+    X-Content-Type-Options = "nosniff"
