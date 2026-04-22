@@ -27,6 +27,16 @@
   status = 200
 
 [[redirects]]
+  from = "/reset-password"
+  to   = "/reset-password.html"
+  status = 200
+
+[[redirects]]
+  from = "/reset-password-confirm"
+  to   = "/reset-password-confirm.html"
+  status = 200
+
+[[redirects]]
   from = "/dashboard"
   to   = "/app.html"
   status = 200
