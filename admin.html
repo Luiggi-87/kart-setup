@@ -204,6 +204,7 @@
       </div>
       <div class="user-section">
         <span id="user-email"></span>
+        <button id="btn-back" style="background: var(--bg-soft); border: 1px solid var(--border); margin-right: 8px;">← App</button>
         <button id="btn-logout">Logout</button>
       </div>
     </header>
@@ -252,6 +253,10 @@
 
     function initAdmin() {
       document.getElementById('user-email').textContent = window._currentUser.email;
+
+      document.getElementById('btn-back').addEventListener('click', () => {
+        window.location.href = '/app.html';
+      });
 
       document.getElementById('btn-logout').addEventListener('click', async () => {
         await sb().auth.signOut();
