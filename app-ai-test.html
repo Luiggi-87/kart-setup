@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Análise de Setup com IA — Kart Setup</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
+
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --bg-soft: #0f1535;
+      --bg-card: #050812;
+      --accent: #00ff88;
+      --accent-soft: rgba(0, 255, 136, 0.15);
+      --accent-glow: rgba(0, 255, 136, 0.4);
+      --text: #e5e7eb;
+      --text-soft: #a0aec0;
+      --text-softer: #6b7280;
+      --border: #1a2847;
+      --danger: #ff4444;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --info: #38bdf8;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #0f1535 50%, #050812 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+      padding: 0 0 12px 0;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-soft);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom: 3px solid var(--accent);
+      margin-bottom: -15px;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Form Styles */
+    .form-container {
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-section {
+      margin-bottom: 28px;
+    }
+
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input,
+    select {
+      padding: 10px 12px;
+      background: rgba(15, 21, 53, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(0, 255, 136, 0.05);
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+    }
+
+    input::placeholder {
+      color: var(--text-softer);
+    }
+
+    /* Analysis Results */
+    .analysis-results {
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+
+    .result-section {
+      margin-bottom: 32px;
+    }
+
+    .result-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--accent-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .diagnosis-card {
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .diagnosis-card strong {
+      color: var(--accent);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .diagnosis-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .practices-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .practice-item {
+      background: rgba(10, 14, 39, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .practice-item.optimal {
+      border-color: rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .practice-item.deviation {
+      border-color: rgba(255, 170, 0, 0.3);
+      background: rgba(255, 170, 0, 0.05);
+    }
+
+    .practice-item.alert {
+      border-color: rgba(255, 68, 68, 0.3);
+      background: rgba(255, 68, 68, 0.05);
+    }
+
+    .practice-item-label {
+      font-size: 11px;
+      color: var(--text-softer);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .practice-item-content {
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .suggestions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .suggestion-item {
+      padding: 16px;
+      border-left: 4px solid var(--info);
+      background: rgba(56, 189, 248, 0.05);
+      border-radius: 4px;
+    }
+
+    .suggestion-item.alta {
+      border-left-color: var(--danger);
+      background: rgba(255, 68, 68, 0.05);
+    }
+
+    .suggestion-item.media {
+      border-left-color: var(--warning);
+      background: rgba(255, 170, 0, 0.05);
+    }
+
+    .suggestion-priority {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .suggestion-priority.alta {
+      background: rgba(255, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    .suggestion-priority.media {
+      background: rgba(255, 170, 0, 0.2);
+      color: var(--warning);
+    }
+
+    .suggestion-priority.baixa {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--info);
+    }
+
+    .suggestion-item h4 {
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 6px;
+      margin-top: 0;
+    }
+
+    .suggestion-item p {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin: 4px 0;
+    }
+
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .confidence-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .confidence-label {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    /* History */
+    .history-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .history-item {
+      background: rgba(5, 8, 18, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .history-item:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    }
+
+    .history-item-date {
+      font-size: 11px;
+      color: var(--text-softer);
+      margin-bottom: 8px;
+    }
+
+    .history-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .history-item-diagnosis {
+      font-size: 12px;
+      color: var(--text-soft);
+      padding: 8px;
+      background: rgba(0, 255, 136, 0.05);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .history-item-confidence {
+      font-size: 11px;
+      color: var(--text-softer);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-soft);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Disclaimer */
+    .disclaimer {
+      background: rgba(255, 170, 0, 0.1);
+      border: 1px solid rgba(255, 170, 0, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .disclaimer strong {
+      color: var(--warning);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Loading */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 255, 136, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-container {
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .loading-text {
+      margin-top: 16px;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    /* Messages */
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .message.error {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: var(--danger);
+    }
+
+    .message.success {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--success);
+    }
+
+    .message.warning {
+      background: rgba(255, 170, 0, 0.1);
+      border: 1px solid rgba(255, 170, 0, 0.3);
+      color: var(--warning);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .practices-list {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>🤖 Análise de Setup</h1>
+        <p>Diagnóstico inteligente com IA — Ambiente de Teste</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="loadSampleSetup()">📋 Carregar Exemplo</button>
+        <a href="app.html" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center;">← Voltar para App</a>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('inputs')">📝 Inputs</button>
+      <button class="tab-btn" onclick="switchTab('analysis')">🔍 Análise</button>
+      <button class="tab-btn" onclick="switchTab('history')">📚 Histórico</button>
+    </div>
+
+    <!-- Tab: Inputs -->
+    <div id="inputs" class="tab-content active">
+      <div class="form-container">
+        <div id="message-container"></div>
+
+        <form id="setupForm">
+          <!-- Pressões -->
+          <div class="form-section">
+            <div class="section-title">🔴 Pressões (bar)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="pressao_fl">Pressão Dianteira Esquerda</label>
+                <input type="number" id="pressao_fl" name="pressao_fl" step="0.01" min="0" max="2" placeholder="0.75">
+              </div>
+              <div class="form-group">
+                <label for="pressao_fr">Pressão Dianteira Direita</label>
+                <input type="number" id="pressao_fr" name="pressao_fr" step="0.01" min="0" max="2" placeholder="0.75">
+              </div>
+              <div class="form-group">
+                <label for="pressao_rl">Pressão Traseira Esquerda</label>
+                <input type="number" id="pressao_rl" name="pressao_rl" step="0.01" min="0" max="2" placeholder="0.80">
+              </div>
+              <div class="form-group">
+                <label for="pressao_rr">Pressão Traseira Direita</label>
+                <input type="number" id="pressao_rr" name="pressao_rr" step="0.01" min="0" max="2" placeholder="0.80">
+              </div>
+            </div>
+          </div>
+
+          <!-- Cambagem e Convergência -->
+          <div class="form-section">
+            <div class="section-title">⚙️ Cambagem e Alinhamento (°)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="cambagem_esq">Cambagem Dianteira Esquerda</label>
+                <input type="number" id="cambagem_esq" name="cambagem_esq" step="0.1" min="-3" max="0" placeholder="-1.5">
+              </div>
+              <div class="form-group">
+                <label for="cambagem_dir">Cambagem Dianteira Direita</label>
+                <input type="number" id="cambagem_dir" name="cambagem_dir" step="0.1" min="-3" max="0" placeholder="-1.5">
+              </div>
+              <div class="form-group">
+                <label for="convergencia">Convergência Dianteira</label>
+                <input type="number" id="convergencia" name="convergencia" step="0.1" min="-2" max="2" placeholder="0.0">
+              </div>
+              <div class="form-group">
+                <label for="anti_roll">Ângulo Anti-Roll Dianteiro</label>
+                <input type="number" id="anti_roll" name="anti_roll" step="0.1" min="0" max="10" placeholder="5">
+              </div>
+            </div>
+          </div>
+
+          <!-- Altura e Suspenção -->
+          <div class="form-section">
+            <div class="section-title">📏 Altura e Suspenção (mm)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="altura_dianteira">Altura Dianteira</label>
+                <input type="number" id="altura_dianteira" name="altura_dianteira" step="0.5" min="0" max="100" placeholder="35">
+              </div>
+              <div class="form-group">
+                <label for="altura_traseira">Altura Traseira</label>
+                <input type="number" id="altura_traseira" name="altura_traseira" step="0.5" min="0" max="100" placeholder="45">
+              </div>
+              <div class="form-group">
+                <label for="suspensao_dianteira">Dureza Suspenção Dianteira</label>
+                <input type="number" id="suspensao_dianteira" name="suspensao_dianteira" step="0.1" min="0" max="10" placeholder="5">
+              </div>
+              <div class="form-group">
+                <label for="suspensao_traseira">Dureza Suspenção Traseira</label>
+                <input type="number" id="suspensao_traseira" name="suspensao_traseira" step="0.1" min="0" max="10" placeholder="5">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bitola -->
+          <div class="form-section">
+            <div class="section-title">↔️ Bitola (mm)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="bitola">Bitola (entre-eixos)</label>
+                <input type="number" id="bitola" name="bitola" step="1" min="1000" max="1300" placeholder="1150">
+              </div>
+              <div class="form-group">
+                <label for="distancia_dianteira">Distância Pneus Dianteira</label>
+                <input type="number" id="distancia_dianteira" name="distancia_dianteira" step="1" min="1000" max="1300" placeholder="1100">
+              </div>
+              <div class="form-group">
+                <label for="distancia_traseira">Distância Pneus Traseira</label>
+                <input type="number" id="distancia_traseira" name="distancia_traseira" step="1" min="1000" max="1300" placeholder="1100">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pneus -->
+          <div class="form-section">
+            <div class="section-title">🛞 Pneus</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="pneu_dianteiro">Modelo Pneu Dianteiro</label>
+                <input type="text" id="pneu_dianteiro" name="pneu_dianteiro" placeholder="ex: Vega Kart">
+              </div>
+              <div class="form-group">
+                <label for="pneu_traseiro">Modelo Pneu Traseiro</label>
+                <input type="text" id="pneu_traseiro" name="pneu_traseiro" placeholder="ex: Vega Kart">
+              </div>
+              <div class="form-group">
+                <label for="temperatura_pneu">Temperatura Ideal Pneu (°C)</label>
+                <input type="number" id="temperatura_pneu" name="temperatura_pneu" step="1" min="0" max="150" placeholder="80">
+              </div>
+            </div>
+          </div>
+
+          <!-- Freios -->
+          <div class="form-section">
+            <div class="section-title">🛑 Freios</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="disco_dianteiro">Espessura Disco Dianteiro (mm)</label>
+                <input type="number" id="disco_dianteiro" name="disco_dianteiro" step="0.1" min="0" max="10" placeholder="1.6">
+              </div>
+              <div class="form-group">
+                <label for="disco_traseiro">Espessura Disco Traseiro (mm)</label>
+                <input type="number" id="disco_traseiro" name="disco_traseiro" step="0.1" min="0" max="10" placeholder="1.2">
+              </div>
+              <div class="form-group">
+                <label for="pastilha_freio">Tipo Pastilha Freio</label>
+                <input type="text" id="pastilha_freio" name="pastilha_freio" placeholder="ex: Brembo">
+              </div>
+            </div>
+          </div>
+
+          <!-- Motor e Performance -->
+          <div class="form-section">
+            <div class="section-title">🏎️ Motor e Performance</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="motor">Modelo Motor</label>
+                <input type="text" id="motor" name="motor" placeholder="ex: Honda GX390">
+              </div>
+              <div class="form-group">
+                <label for="carburador">Carburador</label>
+                <input type="text" id="carburador" name="carburador" placeholder="ex: Walbro">
+              </div>
+              <div class="form-group">
+                <label for="óleo_motor">Viscosidade Óleo</label>
+                <input type="text" id="óleo_motor" name="óleo_motor" placeholder="ex: 10W40">
+              </div>
+              <div class="form-group">
+                <label for="ignição">Avanço Ignição (°)</label>
+                <input type="number" id="ignição" name="ignição" step="0.1" min="0" max="30" placeholder="20">
+              </div>
+            </div>
+          </div>
+
+          <!-- Configurações Adicionais -->
+          <div class="form-section">
+            <div class="section-title">⚡ Configurações Adicionais</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="comentarios">Comentários / Notas</label>
+                <input type="text" id="comentarios" name="comentarios" placeholder="Descreva o comportamento esperado...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; gap: 12px; margin-top: 28px;">
+            <button type="button" class="btn btn-primary" onclick="analyzeSetup()">🔍 Analisar com IA</button>
+            <button type="reset" class="btn btn-secondary" onclick="resetForm()">🔄 Limpar Formulário</button>
+          </div>
+        </form>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          <strong>⚠️ Aviso Importante</strong>
+          Esta análise é simulada para fins educacionais. As recomendações da IA baseiam-se em padrões profissionais, mas não substituem o aconselhamento de um engenheiro de setup experiente. Use como referência, não como verdade absoluta.
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Analysis -->
+    <div id="analysis" class="tab-content">
+      <div id="analysisContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <p>Preencha o formulário acima e clique em "Analisar com IA" para ver os resultados.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: History -->
+    <div id="history" class="tab-content">
+      <div id="historyContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">📚</div>
+          <p>Nenhuma análise salva ainda. Realiza uma análise para que apareça no histórico.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'kartAI_analyses_v1';
+    const API_ENDPOINT = '/.netlify/functions/analyze-setup';
+    let currentAnalysis = null;
+
+    // Reference data for best practices
+    const KART_REFERENCE_DATA = {
+      pressures: { optimal_min: 0.75, optimal_max: 0.85, range_min: 0.6, range_max: 1.0 },
+      cambagem: { optimal_min: -1.5, optimal_max: -1.0, range_min: -2.5, range_max: -0.5 },
+      bitola: { narrow_min: 1100, narrow_max: 1150, wide_min: 1150, wide_max: 1250 },
+      altura_dianteira: { optimal_min: 30, optimal_max: 40, range_min: 20, range_max: 50 },
+      altura_traseira: { optimal_min: 40, optimal_max: 50, range_min: 30, range_max: 60 }
+    };
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Remove active from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+
+      // Mark button as active
+      event.target.classList.add('active');
+
+      // Refresh history if switching to history tab
+      if (tabName === 'history') {
+        loadHistory();
+      }
+    }
+
+    // Show message
+    function showMessage(text, type = 'info') {
+      const container = document.getElementById('message-container');
+      const message = document.createElement('div');
+      message.className = `message ${type}`;
+      message.innerHTML = `<span>${text}</span>`;
+      container.innerHTML = '';
+      container.appendChild(message);
+
+      if (type !== 'error') {
+        setTimeout(() => {
+          message.style.display = 'none';
+        }, 5000);
+      }
+    }
+
+    // Get form data
+    function getFormData() {
+      const formData = new FormData(document.getElementById('setupForm'));
+      const data = {};
+      for (let [key, value] of formData.entries()) {
+        data[key] = value === '' ? null : isNaN(value) ? value : parseFloat(value);
+      }
+      return data;
+    }
+
+    // Load sample setup
+    function loadSampleSetup() {
+      const sampleSetup = {
+        pressao_fl: 0.75,
+        pressao_fr: 0.75,
+        pressao_rl: 0.80,
+        pressao_rr: 0.80,
+        cambagem_esq: -1.5,
+        cambagem_dir: -1.5,
+        convergencia: 0,
+        anti_roll: 5,
+        altura_dianteira: 35,
+        altura_traseira: 45,
+        suspensao_dianteira: 5,
+        suspensao_traseira: 5,
+        bitola: 1150,
+        distancia_dianteira: 1100,
+        distancia_traseira: 1100,
+        pneu_dianteiro: 'Vega Kart',
+        pneu_traseiro: 'Vega Kart',
+        temperatura_pneu: 80,
+        disco_dianteiro: 1.6,
+        disco_traseiro: 1.2,
+        pastilha_freio: 'Brembo',
+        motor: 'Honda GX390',
+        carburador: 'Walbro',
+        óleo_motor: '10W40',
+        ignição: 20,
+        comentarios: 'Setup equilibrado para circuit racing'
+      };
+
+      Object.keys(sampleSetup).forEach(key => {
+        const input = document.getElementById(key);
+        if (input) {
+          input.value = sampleSetup[key];
+        }
+      });
+
+      showMessage('✅ Setup de exemplo carregado com sucesso!', 'success');
+    }
+
+    // Reset form
+    function resetForm() {
+      document.getElementById('setupForm').reset();
+      showMessage('🔄 Formulário limpo', 'info');
+    }
+
+    // Analyze setup with AI
+    async function analyzeSetup() {
+      const setupData = getFormData();
+      const btn = event.target;
+
+      // Validate that at least some fields are filled
+      const filledFields = Object.values(setupData).filter(v => v !== null).length;
+      if (filledFields < 5) {
+        showMessage('⚠️ Por favor, preencha pelo menos 5 campos', 'warning');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Analisando...';
+
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(setupData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro ${response.status}`);
+        }
+
+        const analysis = await response.json();
+        currentAnalysis = {
+          ...analysis,
+          timestamp: new Date().toISOString(),
+          setupData: setupData
+        };
+
+        // Save to history
+        saveToHistory(currentAnalysis);
+
+        // Display results
+        displayAnalysis(currentAnalysis);
+
+        // Switch to analysis tab
+        document.getElementById('analysis').classList.add('active');
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.querySelectorAll('.tab-content').forEach((t, i) => {
+          if (i !== 1) t.classList.remove('active');
+        });
+
+        showMessage('✅ Análise concluída com sucesso!', 'success');
+      } catch (error) {
+        showMessage(`❌ Erro na análise: ${error.message}`, 'error');
+        console.error('Analysis error:', error);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔍 Analisar com IA';
+      }
+    }
+
+    // Display analysis results
+    function displayAnalysis(analysis) {
+      const content = document.getElementById('analysisContent');
+      const diag = analysis.diagnostico_comportamento || {};
+      const practices = analysis.comparacao_praticas || {};
+      const adjustments = analysis.sugestoes_ajustes || [];
+      const confidence = analysis.confianca || 0;
+
+      let html = `
+        <div class="analysis-results">
+          <div class="result-section">
+            <div class="result-title">Diagnóstico de Comportamento</div>
+            <div class="diagnosis-card">
+              <strong>Tendência Principal: ${diag.tendencia_principal || 'N/A'}</strong>
+              <p>${diag.descricao || 'Análise em processamento...'}</p>
+            </div>
+            <div class="form-grid" style="margin-top: 16px;">
+              <div class="diagnosis-card">
+                <strong>🏃 Aceleração</strong>
+                <p>${diag.aceleracao || 'N/A'}</p>
+              </div>
+              <div class="diagnosis-card">
+                <strong>🛑 Frenagem</strong>
+                <p>${diag.frenagem || 'N/A'}</p>
+              </div>
+              <div class="diagnosis-card">
+                <strong>🔄 Curva</strong>
+                <p>${diag.curva || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-title">Comparação com Melhores Práticas</div>
+      `;
+
+      if (practices.campos_otimos && practices.campos_otimos.length > 0) {
+        html += `<h4 style="color: var(--success); margin-bottom: 12px;">✅ Campos Otimizados</h4>`;
+        html += `<div class="practices-list">`;
+        practices.campos_otimos.forEach(field => {
+          html += `
+            <div class="practice-item optimal">
+              <div class="practice-item-label">Excelente</div>
+              <div class="practice-item-content">${field}</div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      if (practices.campos_desviam && practices.campos_desviam.length > 0) {
+        html += `<h4 style="color: var(--warning); margin-bottom: 12px; margin-top: 12px;">⚠️ Campos que Desviam</h4>`;
+        html += `<div class="practices-list">`;
+        practices.campos_desviam.forEach(field => {
+          html += `
+            <div class="practice-item deviation">
+              <div class="practice-item-label">${field.campo}</div>
+              <div class="practice-item-content">
+                <strong>Atual:</strong> ${field.valor_entrada}<br>
+                <strong>Recomendado:</strong> ${field.recomendacao}<br>
+                <small>${field.razao}</small>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      if (practices.campos_alerta && practices.campos_alerta.length > 0) {
+        html += `<h4 style="color: var(--danger); margin-bottom: 12px; margin-top: 12px;">🚨 Alertas</h4>`;
+        html += `<div class="practices-list">`;
+        practices.campos_alerta.forEach(field => {
+          html += `
+            <div class="practice-item alert">
+              <div class="practice-item-label">Alerta</div>
+              <div class="practice-item-content">
+                <strong>${field.campo}</strong><br>
+                ${field.motivo}
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+
+      if (adjustments && adjustments.length > 0) {
+        html += `
+          <div class="result-section">
+            <div class="result-title">Sugestões de Ajustes</div>
+            <div class="suggestions-list">
+        `;
+        adjustments.forEach(adj => {
+          html += `
+            <div class="suggestion-item ${adj.prioridade}">
+              <div class="suggestion-priority ${adj.prioridade}">${adj.prioridade.toUpperCase()}</div>
+              <h4>${adj.ajuste}</h4>
+              <p><strong>Por quê:</strong> ${adj.motivo}</p>
+              <p><strong>Mudança:</strong> ${adj.antes} → ${adj.depois}</p>
+            </div>
+          `;
+        });
+        html += `</div></div>`;
+      }
+
+      html += `
+          <div class="confidence-badge">
+            <div style="flex: 1;">
+              <div class="confidence-label">Confiança da Análise</div>
+              <div class="confidence-value">${(confidence * 100).toFixed(0)}%</div>
+            </div>
+          </div>
+
+          <div class="disclaimer" style="margin-top: 24px;">
+            <strong>⚠️ Lembrete</strong>
+            Esta análise é baseada em padrões profissionais e reflete uma avaliação teórica. Resultados reais podem variar conforme condições de pista, estilo de pilotagem e outros fatores externos.
+          </div>
+        </div>
+      `;
+
+      content.innerHTML = html;
+    }
+
+    // Save to history
+    function saveToHistory(analysis) {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      history.unshift(analysis);
+      if (history.length > 20) history.pop(); // Keep last 20
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    // Load history
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const content = document.getElementById('historyContent');
+
+      if (history.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📚</div>
+            <p>Nenhuma análise salva ainda. Realiza uma análise para que apareça no histórico.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `<div class="history-list">`;
+      history.forEach((item, index) => {
+        const date = new Date(item.timestamp).toLocaleDateString('pt-BR', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const diagnosis = item.diagnostico_comportamento?.tendencia_principal || 'N/A';
+        const confidence = ((item.confianca || 0) * 100).toFixed(0);
+
+        html += `
+          <div class="history-item" onclick="loadHistoryItem(${index})">
+            <div class="history-item-date">${date}</div>
+            <div class="history-item-title">Análise #${history.length - index}</div>
+            <div class="history-item-diagnosis">Tendência: <strong>${diagnosis}</strong></div>
+            <div class="history-item-confidence">Confiança: ${confidence}%</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+
+      content.innerHTML = html;
+    }
+
+    // Load history item
+    function loadHistoryItem(index) {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      currentAnalysis = history[index];
+      displayAnalysis(currentAnalysis);
+
+      // Switch to analysis tab
+      document.getElementById('analysis').classList.add('active');
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.querySelectorAll('.tab-content').forEach((t, i) => {
+        if (i !== 1) t.classList.remove('active');
+      });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSampleSetup();
+    });
+  </script>
+</body>
+</html>
