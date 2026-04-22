@@ -370,21 +370,28 @@
         return;
       }
 
-      // Sem assinatura → criar checkout no Mercado Pago
+      // Sem assinatura → criar trial automático (7 dias)
       const btn = document.getElementById('btn-login');
-      setLoading(btn, true, 'Redirecionando para pagamento...');
+      setLoading(btn, true, 'Ativando trial de 7 dias...');
 
       try {
-        const res = await fetch('/.netlify/functions/create-subscription', {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
-        });
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + 7);
 
-        if (!res.ok) throw new Error('Erro ao criar assinatura');
-        const { checkout_url } = await res.json();
-        window.location.href = checkout_url;
+        const { error } = await sb.from('profiles').update({
+          subscription_status: 'trial',
+          trial_ends_at: trialEnd.toISOString()
+        }).eq('id', session.user.id);
+
+        if (error) throw error;
+
+        // Redirecionar para app/admin
+        const redirectUrl = profile?.role === 'admin' ? 'admin.html' : 'app.html';
+        window.location.href = redirectUrl;
       } catch (e) {
         setLoading(btn, false, 'Entrar');
-        showError(document.getElementById('login-error'), 'Erro ao redirecionar para o pagamento. Tente novamente.');
+        showError(document.getElementById('login-error'), 'Erro ao ativar trial. Tente novamente.');
+        console.error('Trial error:', e);
       }
     }
 
