@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kart Setup — O dashboard técnico para quem pilota de verdade</title>
+  <meta name="description" content="Registre setups, analise telemetria do MyChron e Alfano, e evolua a cada sessão. O dashboard técnico mais completo para kartistas." />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #0f172a;
+      --bg-card: #111827;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: #1f2937;
+      --danger: #f97373;
+      --info: #38bdf8;
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── HEADER ─────────────────────────────────────── */
+    .site-header {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(31, 41, 55, 0.8);
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a, #065f46);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px;
+      box-shadow: 0 0 24px rgba(34,197,94,0.6);
+    }
+    .brand-name { font-size: 17px; font-weight: 700; }
+
+    .nav-links { display: flex; align-items: center; gap: 20px; font-size: 13px; }
+    .nav-links a { color: var(--text-soft); transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 18px; border-radius: 999px; border: 1px solid transparent; font-size: 13px; font-weight: 600; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, background 0.15s; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #022c22; box-shadow: 0 8px 24px rgba(34,197,94,0.4); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(34,197,94,0.55); background: linear-gradient(135deg, #4ade80, var(--accent-dark)); }
+    .btn-outline { background: transparent; color: var(--text-soft); border-color: rgba(148,163,184,0.35); }
+    .btn-outline:hover { color: var(--text); border-color: rgba(148,163,184,0.7); transform: translateY(-1px); }
+    .btn-lg { padding: 13px 28px; font-size: 15px; }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34,197,94,0.18) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(59,130,246,0.08) 0%, transparent 50%),
+        radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      z-index: 0;
+    }
+
+    .hero > * { position: relative; z-index: 1; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.35);
+      background: rgba(34,197,94,0.08);
+      font-size: 12px; color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 62px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 860px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px);
+      color: var(--text-soft);
+      max-width: 580px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px; }
+
+    .hero-trial-note { font-size: 12px; color: var(--text-soft); }
+    .hero-trial-note strong { color: var(--text); }
+
+    /* Mock app preview */
+    .app-preview {
+      margin-top: 40px;
+      max-width: 900px;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid rgba(34,197,94,0.25);
+      background: linear-gradient(145deg, #0f172a, #020617);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(34,197,94,0.1);
+      overflow: hidden;
+    }
+
+    .preview-bar {
+      background: rgba(15,23,42,0.9);
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .preview-dot-r { background: #f97373; }
+    .preview-dot-y { background: #fbbf24; }
+    .preview-dot-g { background: #22c55e; }
+    .preview-url {
+      flex: 1; background: rgba(30,41,59,0.8); border-radius: 6px;
+      padding: 4px 10px; font-size: 11px; color: var(--text-soft);
+      text-align: center; margin: 0 8px;
+    }
+
+    .preview-content {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 14px;
+      min-height: 300px;
+    }
+
+    .preview-sidebar {
+      background: rgba(17,24,39,0.8);
+      border-radius: 14px;
+      border: 1px solid rgba(30,64,175,0.5);
+      padding: 14px;
+    }
+    .preview-sidebar-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-soft); margin-bottom: 10px; }
+    .preview-filter { height: 8px; border-radius: 4px; background: rgba(31,41,55,0.9); margin-bottom: 8px; }
+    .preview-filter:nth-child(2) { width: 80%; }
+    .preview-filter:nth-child(3) { width: 60%; }
+    .preview-filter:nth-child(4) { width: 70%; }
+
+    .preview-main { display: flex; flex-direction: column; gap: 10px; }
+    .preview-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .preview-card {
+      border-radius: 12px; border: 1px solid rgba(30,64,175,0.5);
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.2), transparent 60%), #020617;
+      padding: 10px;
+    }
+    .preview-card-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-soft); margin-bottom: 4px; }
+    .preview-card-value { font-size: 22px; font-weight: 700; }
+    .preview-card-value.green { color: var(--accent); }
+    .preview-table { border-radius: 12px; border: 1px solid rgba(30,64,175,0.5); overflow: hidden; background: #020617; }
+    .preview-table-header { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 0; padding: 7px 10px; background: rgba(15,23,42,0.9); }
+    .preview-th { font-size: 8px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-soft); }
+    .preview-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; padding: 7px 10px; border-top: 1px solid rgba(15,23,42,0.7); gap: 0; }
+    .preview-row:hover { background: rgba(15,23,42,0.5); }
+    .preview-cell { font-size: 10px; color: var(--text); }
+    .preview-pill { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 9px; }
+    .pill-blue { border: 1px solid rgba(129,140,248,0.7); background: rgba(129,140,248,0.15); }
+    .pill-green { border: 1px solid rgba(34,197,94,0.7); color: #bbf7d0; }
+    .pill-teal { border: 1px solid rgba(56,189,248,0.7); color: #bae6fd; }
+
+    /* ── SECTION COMMON ──────────────────────────────── */
+    section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--accent); margin-bottom: 12px; display: block;
+    }
+    .section-title { font-size: clamp(26px, 4vw, 40px); font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
+    .section-sub { font-size: 16px; color: var(--text-soft); max-width: 560px; }
+
+    /* ── FEATURES ────────────────────────────────────── */
+    #features { padding-top: 20px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      border-radius: var(--radius);
+      border: 1px solid rgba(30,64,175,0.6);
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.25), transparent 55%), #0f172a;
+      padding: 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-3px); border-color: rgba(34,197,94,0.4); }
+
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .feature-icon-green { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+    .feature-icon-blue  { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); }
+    .feature-icon-teal  { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); }
+    .feature-icon-purple{ background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); }
+
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+    .feature-list { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .feature-list li { font-size: 12px; color: var(--text-soft); display: flex; align-items: center; gap: 8px; }
+    .feature-list li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+    /* ── COMO FUNCIONA ───────────────────────────────── */
+    #como-funciona { border-top: 1px solid var(--border); }
+
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 48px; }
+    .step { text-align: center; }
+    .step-number {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #022c22; font-weight: 800; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.4);
+    }
+    .step h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .step p { font-size: 13px; color: var(--text-soft); }
+
+    /* ── PRICING ─────────────────────────────────────── */
+    #pricing { border-top: 1px solid var(--border); text-align: center; }
+
+    .pricing-card {
+      max-width: 440px; margin: 48px auto 0;
+      border-radius: 24px;
+      border: 1px solid rgba(34,197,94,0.45);
+      background: radial-gradient(circle at top, rgba(34,197,94,0.14), transparent 55%), #0f172a;
+      padding: 36px 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-badge {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--accent); color: #022c22;
+      font-size: 10px; font-weight: 700;
+      padding: 4px 10px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.12em;
+    }
+
+    .pricing-name { font-size: 13px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-soft); margin-bottom: 10px; }
+
+    .pricing-price { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-bottom: 6px; }
+    .pricing-price .currency { font-size: 22px; font-weight: 700; color: var(--text-soft); margin-top: 6px; }
+    .pricing-price .amount   { font-size: 64px; font-weight: 800; line-height: 1; }
+    .pricing-price .period   { font-size: 16px; color: var(--text-soft); }
+
+    .pricing-trial { font-size: 13px; color: var(--accent); margin-bottom: 28px; }
+
+    .pricing-features { list-style: none; text-align: left; margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; }
+    .pricing-features li { font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .pricing-features li .check { color: var(--accent); font-size: 16px; font-weight: 700; flex-shrink: 0; }
+
+    .pricing-note { font-size: 11px; color: var(--text-soft); margin-top: 16px; }
+
+    /* ── FAQ ─────────────────────────────────────────── */
+    #faq { border-top: 1px solid var(--border); }
+
+    .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 48px; }
+    .faq-item {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      padding: 20px;
+    }
+    .faq-item h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+    /* ── CTA FINAL ───────────────────────────────────── */
+    .cta-section {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 80px 24px;
+      background: radial-gradient(ellipse 70% 50% at 50% 100%, rgba(34,197,94,0.1), transparent 70%);
+    }
+    .cta-section h2 { font-size: clamp(24px, 4vw, 40px); font-weight: 800; margin-bottom: 14px; }
+    .cta-section p { font-size: 16px; color: var(--text-soft); margin-bottom: 32px; }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    footer a { color: var(--text-soft); }
+    footer a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links .hide-mobile { display: none; }
+      .preview-content { grid-template-columns: 1fr; }
+      .preview-sidebar { display: none; }
+      .preview-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .site-header { padding: 12px 16px; }
+      section { padding: 60px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <span class="brand-name">Kart Setup</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#features" class="hide-mobile">Funcionalidades</a>
+      <a href="#pricing" class="hide-mobile">Preço</a>
+      <a href="#faq" class="hide-mobile">FAQ</a>
+      <a href="login.html" class="btn btn-outline" style="padding:7px 14px;font-size:12px;">Entrar</a>
+      <a href="login.html?action=signup" class="btn btn-primary" style="padding:7px 14px;font-size:12px;">Começar grátis</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Dashboard técnico para kartistas
+    </div>
+
+    <h1>O dashboard técnico para quem <span class="highlight">pilota de verdade</span></h1>
+
+    <p class="hero-sub">Registre setups, analise telemetria do MyChron e Alfano, e evolua a cada sessão. Tudo em um único lugar, acessível em qualquer dispositivo.</p>
+
+    <div class="hero-ctas">
+      <a href="login.html?action=signup" class="btn btn-primary btn-lg">Começar 7 dias grátis</a>
+      <a href="#features" class="btn btn-outline btn-lg">Ver funcionalidades</a>
+    </div>
+
+    <div class="hero-trial-note">
+      <strong>7 dias grátis</strong> • Sem cartão de crédito para começar • Cancele quando quiser
+    </div>
+
+    <!-- App Preview Mockup -->
+    <div class="app-preview">
+      <div class="preview-bar">
+        <div class="preview-dot preview-dot-r"></div>
+        <div class="preview-dot preview-dot-y"></div>
+        <div class="preview-dot preview-dot-g"></div>
+        <div class="preview-url">kartrepublic.app/dashboard</div>
+      </div>
+      <div class="preview-content">
+        <div class="preview-sidebar">
+          <div class="preview-sidebar-title">Filtros &amp; Busca</div>
+          <div class="preview-filter"></div>
+          <div class="preview-filter"></div>
+          <div class="preview-filter"></div>
+          <div class="preview-filter"></div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-cards">
+            <div class="preview-card">
+              <div class="preview-card-label">Total de Setups</div>
+              <div class="preview-card-value green">24</div>
+            </div>
+            <div class="preview-card">
+              <div class="preview-card-label">Pistas Cadastradas</div>
+              <div class="preview-card-value">7</div>
+            </div>
+            <div class="preview-card">
+              <div class="preview-card-label">Sessões Telemetria</div>
+              <div class="preview-card-value">12</div>
+            </div>
+          </div>
+          <div class="preview-table">
+            <div class="preview-table-header">
+              <span class="preview-th">Data</span>
+              <span class="preview-th">Kart</span>
+              <span class="preview-th">Pista</span>
+              <span class="preview-th">Tipo</span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-cell">12/04/2025</span>
+              <span class="preview-cell"><span class="preview-pill pill-blue">Tony Kart</span></span>
+              <span class="preview-cell">Granja Viana</span>
+              <span class="preview-cell"><span class="preview-pill pill-green">Alto grip</span></span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-cell">05/04/2025</span>
+              <span class="preview-cell"><span class="preview-pill pill-blue">CRG Neos</span></span>
+              <span class="preview-cell">Aldeia da Serra</span>
+              <span class="preview-cell"><span class="preview-pill pill-green">Treino</span></span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-cell">28/03/2025</span>
+              <span class="preview-cell"><span class="preview-pill pill-blue">Tony Kart</span></span>
+              <span class="preview-cell">Interlagos</span>
+              <span class="preview-cell"><span class="preview-pill pill-teal">Qualy</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <span class="section-label">Funcionalidades</span>
+    <h2 class="section-title">Tudo que você precisa para evoluir no kart</h2>
+    <p class="section-sub">Do setup técnico à análise de telemetria, o Kart Setup centraliza tudo em um dashboard elegante e fácil de usar.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-green">🔧</div>
+        <h3>Gestão completa de setups</h3>
+        <p>Registre todos os parâmetros técnicos de cada sessão — da geometria à transmissão. Nunca mais perca um ajuste que funcionou.</p>
+        <ul class="feature-list">
+          <li>Bitola, cambagem, caster e toe</li>
+          <li>Pressão dos pneus por roda (FL/FR/RL/RR)</li>
+          <li>Tipo de eixo, altura e inclinação do banco</li>
+          <li>Transmissão (coroa) e para-choques</li>
+          <li>Observações do piloto</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-teal">📡</div>
+        <h3>Análise de telemetria</h3>
+        <p>Importe arquivos CSV do MyChron ou Alfano e visualize seus dados de volta com gráficos profissionais.</p>
+        <ul class="feature-list">
+          <li>Importação de CSV do MyChron (Race Studio)</li>
+          <li>Compatível com Alfano Kronos</li>
+          <li>Gráfico de tempos de volta comparativo</li>
+          <li>Curva de velocidade e RPM sobrepostos</li>
+          <li>Melhor volta e consistência</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-blue">🔍</div>
+        <h3>Busca e filtros avançados</h3>
+        <p>Encontre qualquer setup em segundos. Filtre por pista, kart, tipo de ajuste ou busque por texto livre.</p>
+        <ul class="feature-list">
+          <li>Filtro por kart / chassi</li>
+          <li>Filtro por pista</li>
+          <li>Filtro por tipo de ajuste</li>
+          <li>Busca livre em todos os campos</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon feature-icon-purple">📊</div>
+        <h3>Exportação e backup</h3>
+        <p>Exporte seus setups em CSV para abrir no Excel ou Google Sheets. Seus dados sempre ao seu alcance.</p>
+        <ul class="feature-list">
+          <li>Exportação CSV com vírgula (padrão universal)</li>
+          <li>Exporta apenas os setups filtrados</li>
+          <li>Compatível com Excel e Google Sheets</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section id="como-funciona">
+    <span class="section-label">Como funciona</span>
+    <h2 class="section-title">Em 3 passos simples</h2>
+    <p class="section-sub">Do cadastro à análise, o Kart Setup foi desenhado para ser rápido de usar, mesmo no box.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Crie sua conta</h3>
+        <p>Cadastre seu e-mail e senha. Em 7 dias de trial gratuito você já consegue ver o valor do sistema.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Registre seus setups</h3>
+        <p>Após cada sessão, preencha os dados técnicos do kart — geometria, pneus, transmissão e anotações.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Importe a telemetria</h3>
+        <p>Arraste o CSV do MyChron ou Alfano e veja a análise completa de voltas e gráficos instantaneamente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <span class="section-label">Preço</span>
+    <h2 class="section-title">Um plano simples. Sem surpresas.</h2>
+    <p class="section-sub">Acesso completo a todas as funcionalidades por uma mensalidade fixa.</p>
+
+    <div class="pricing-card">
+      <span class="pricing-badge">Mais popular</span>
+
+      <div class="pricing-name">Pro Piloto</div>
+      <div class="pricing-price">
+        <span class="currency">R$</span>
+        <span class="amount">49</span>
+        <span class="period">/mês</span>
+      </div>
+      <div class="pricing-trial">7 dias grátis para começar</div>
+
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Setups ilimitados</li>
+        <li><span class="check">✓</span> Telemetria: MyChron &amp; Alfano</li>
+        <li><span class="check">✓</span> Gráficos de voltas e velocidade</li>
+        <li><span class="check">✓</span> Filtros e busca avançada</li>
+        <li><span class="check">✓</span> Exportação CSV</li>
+        <li><span class="check">✓</span> Acesso em qualquer dispositivo</li>
+        <li><span class="check">✓</span> Atualizações incluídas</li>
+      </ul>
+
+      <a href="login.html?action=signup" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px;">
+        Começar 7 dias grátis
+      </a>
+
+      <p class="pricing-note">
+        Pagamento via Mercado Pago (cartão, PIX ou boleto). Cancele quando quiser, sem fidelidade.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <span class="section-label">Perguntas frequentes</span>
+    <h2 class="section-title">Dúvidas comuns</h2>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h3>Meus dados ficam na nuvem?</h3>
+        <p>Sim. Seus setups e sessões de telemetria ficam armazenados no seu navegador localmente e podem ser exportados em CSV a qualquer momento. Uma sincronização em nuvem está em desenvolvimento.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Posso cancelar quando quiser?</h3>
+        <p>Sim. O cancelamento é feito diretamente no Mercado Pago, sem burocracia. Você mantém o acesso até o fim do período pago.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Funciona no celular?</h3>
+        <p>Sim. O dashboard é responsivo e funciona em qualquer dispositivo com um navegador moderno — desktop, tablet ou celular.</p>
+      </div>
+      <div class="faq-item">
+        <h3>O que é o MyChron e Alfano?</h3>
+        <p>São os sistemas de telemetria mais usados no kart. O MyChron é da AIM Sports, e o Alfano é da Alfano SRL. Ambos exportam dados de volta em formato CSV que o Kart Setup importa e analisa automaticamente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <div class="cta-section">
+    <h2>Pronto para evoluir no kart?</h2>
+    <p>Junte-se a kartistas que já usam dados para andar mais rápido.</p>
+    <a href="login.html?action=signup" class="btn btn-primary btn-lg">
+      Começar 7 dias grátis — R$49/mês depois
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2025 Kart Setup. Todos os direitos reservados.</div>
+    <div>
+      <a href="login.html">Entrar</a> &nbsp;·&nbsp;
+      <a href="login.html?action=signup">Criar conta</a>
+    </div>
+  </footer>
+
+</body>
+</html>

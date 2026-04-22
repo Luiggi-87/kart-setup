@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kart Setup — Entrar</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-card: #0f172a;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: #1f2937;
+      --danger: #f97373;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -5%, rgba(34,197,94,0.14), transparent 55%),
+        radial-gradient(circle at top, #1f2937 0, #020617 50%, #000 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px;
+      color: var(--text);
+    }
+
+    .logo-link {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
+      margin-bottom: 32px;
+    }
+    .logo-icon {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a, #065f46);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px;
+      box-shadow: 0 0 28px rgba(34,197,94,0.6);
+    }
+    .logo-name { font-size: 20px; font-weight: 700; }
+
+    .card {
+      width: 100%; max-width: 400px;
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.2), transparent 55%), var(--bg-card);
+      border-radius: 22px;
+      border: 1px solid rgba(30,64,175,0.6);
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+
+    /* TABS */
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; text-align: center;
+      background: none; border: none; border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      color: var(--text-soft); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: color 0.15s, border-color 0.15s;
+    }
+    .auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin-bottom: 20px; }
+
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--text-soft); margin-bottom: 4px; }
+    .field input {
+      width: 100%;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+    }
+
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 40px; }
+    .toggle-pw {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--text-soft);
+      font-size: 14px; padding: 0; line-height: 1;
+      transition: color 0.15s;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    .btn-submit {
+      width: 100%; padding: 12px;
+      border-radius: 999px; border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #022c22; font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.4);
+      margin-top: 6px;
+    }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(34,197,94,0.55); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error-msg {
+      display: none;
+      background: rgba(249,115,115,0.1);
+      border: 1px solid rgba(249,115,115,0.4);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--danger);
+      margin-bottom: 14px;
+    }
+    .error-msg.show { display: block; }
+
+    .info-msg {
+      display: none;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.35);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .info-msg.show { display: block; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    .alt-link { font-size: 12px; color: var(--text-soft); text-align: center; }
+    .alt-link a { color: var(--accent); text-decoration: none; }
+    .alt-link a:hover { text-decoration: underline; }
+
+    .back-link {
+      margin-top: 24px;
+      font-size: 12px; color: var(--text-soft); text-align: center;
+      text-decoration: none; display: block;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--text); }
+
+    /* Alerta de expiração */
+    .alert-banner {
+      display: none;
+      width: 100%; max-width: 400px;
+      background: rgba(249,115,115,0.1);
+      border: 1px solid rgba(249,115,115,0.35);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--danger);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .alert-banner.show { display: block; }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(2,44,34,0.4);
+      border-top-color: #022c22;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <a href="landing.html" class="logo-link">
+    <div class="logo-icon">K</div>
+    <span class="logo-name">Kart Setup</span>
+  </a>
+
+  <!-- Banner de assinatura expirada -->
+  <div class="alert-banner" id="alert-expired">
+    Sua assinatura expirou. Renove para continuar acessando o dashboard.
+  </div>
+
+  <div class="card">
+    <!-- Abas -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-panel="login">Entrar</button>
+      <button class="auth-tab" data-panel="signup">Criar conta</button>
+    </div>
+
+    <!-- PAINEL: LOGIN -->
+    <div class="auth-panel active" id="panel-login">
+      <h2>Bem-vindo de volta</h2>
+      <p class="subtitle">Entre com seu e-mail e senha para acessar o dashboard.</p>
+
+      <div class="error-msg" id="login-error"></div>
+
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="login-password">Senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="login-password" placeholder="Sua senha" autocomplete="current-password" />
+          <button class="toggle-pw" data-target="login-password" type="button" aria-label="Mostrar senha">👁</button>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btn-login">Entrar</button>
+    </div>
+
+    <!-- PAINEL: SIGNUP -->
+    <div class="auth-panel" id="panel-signup">
+      <h2>Crie sua conta</h2>
+      <p class="subtitle">7 dias grátis, sem cartão de crédito para começar.</p>
+
+      <div class="error-msg" id="signup-error"></div>
+      <div class="info-msg" id="signup-info"></div>
+
+      <div class="field">
+        <label for="signup-email">E-mail</label>
+        <input type="email" id="signup-email" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="signup-password">Senha <span style="color:var(--text-soft);font-size:10px;">(mínimo 8 caracteres)</span></label>
+        <div class="password-wrapper">
+          <input type="password" id="signup-password" placeholder="Crie uma senha forte" autocomplete="new-password" minlength="8" />
+          <button class="toggle-pw" data-target="signup-password" type="button" aria-label="Mostrar senha">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="signup-password-confirm">Confirmar senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="signup-password-confirm" placeholder="Repita a senha" autocomplete="new-password" />
+          <button class="toggle-pw" data-target="signup-password-confirm" type="button" aria-label="Mostrar senha">👁</button>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btn-signup">Criar conta grátis</button>
+    </div>
+  </div>
+
+  <a href="landing.html" class="back-link">← Voltar para a página inicial</a>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    // CONFIGURAÇÃO SUPABASE — preencha com suas credenciais
+    // ═══════════════════════════════════════════════════
+    const SUPABASE_URL      = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ─── TABS ──────────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'signup') activateTab('signup');
+    if (params.get('expired') === '1') document.getElementById('alert-expired').classList.add('show');
+
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => activateTab(tab.dataset.panel));
+    });
+
+    function activateTab(panel) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.panel === panel));
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${panel}`));
+    }
+
+    // ─── TOGGLE SENHA ──────────────────────────────────
+    document.querySelectorAll('.toggle-pw').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        btn.textContent = input.type === 'password' ? '👁' : '🔒';
+      });
+    });
+
+    // ─── LOGIN ─────────────────────────────────────────
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errEl    = document.getElementById('login-error');
+      const btn      = document.getElementById('btn-login');
+
+      if (!email || !password) { showError(errEl, 'Preencha e-mail e senha.'); return; }
+
+      setLoading(btn, true, 'Entrando...');
+      errEl.classList.remove('show');
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        setLoading(btn, false, 'Entrar');
+        showError(errEl, translateError(error.message));
+        return;
+      }
+
+      await redirectAfterLogin(data.session);
+    });
+
+    // ─── SIGNUP ────────────────────────────────────────
+    document.getElementById('btn-signup').addEventListener('click', async () => {
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm  = document.getElementById('signup-password-confirm').value;
+      const errEl    = document.getElementById('signup-error');
+      const infoEl   = document.getElementById('signup-info');
+      const btn      = document.getElementById('btn-signup');
+
+      errEl.classList.remove('show');
+      infoEl.classList.remove('show');
+
+      if (!email || !password) { showError(errEl, 'Preencha todos os campos.'); return; }
+      if (password.length < 8) { showError(errEl, 'A senha deve ter pelo menos 8 caracteres.'); return; }
+      if (password !== confirm) { showError(errEl, 'As senhas não coincidem.'); return; }
+
+      setLoading(btn, true, 'Criando conta...');
+
+      const { data, error } = await sb.auth.signUp({ email, password });
+
+      if (error) {
+        setLoading(btn, false, 'Criar conta grátis');
+        showError(errEl, translateError(error.message));
+        return;
+      }
+
+      setLoading(btn, false, 'Criar conta grátis');
+
+      // Se confirmação de email estiver desativada no Supabase → sessão já existe
+      if (data.session) {
+        await redirectAfterLogin(data.session);
+        return;
+      }
+
+      // Confirmação de email ativada
+      infoEl.textContent = '✉️ Verifique seu e-mail para confirmar o cadastro. Após confirmar, volte aqui para entrar.';
+      infoEl.classList.add('show');
+    });
+
+    // ─── REDIRECT APÓS LOGIN ───────────────────────────
+    async function redirectAfterLogin(session) {
+      // Checar status de assinatura
+      const { data: profile } = await sb.from('profiles')
+        .select('subscription_status, current_period_end, trial_ends_at')
+        .eq('id', session.user.id)
+        .single();
+
+      const now = new Date();
+      const isActive  = profile?.subscription_status === 'active'  && new Date(profile.current_period_end) > now;
+      const isInTrial = profile?.subscription_status === 'trial'   && new Date(profile.trial_ends_at) > now;
+
+      if (isActive || isInTrial) {
+        window.location.href = 'app.html';
+        return;
+      }
+
+      // Sem assinatura → criar checkout no Mercado Pago
+      const btn = document.getElementById('btn-login');
+      setLoading(btn, true, 'Redirecionando para pagamento...');
+
+      try {
+        const res = await fetch('/.netlify/functions/create-subscription', {
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+
+        if (!res.ok) throw new Error('Erro ao criar assinatura');
+        const { checkout_url } = await res.json();
+        window.location.href = checkout_url;
+      } catch (e) {
+        setLoading(btn, false, 'Entrar');
+        showError(document.getElementById('login-error'), 'Erro ao redirecionar para o pagamento. Tente novamente.');
+      }
+    }
+
+    // ─── HELPERS ───────────────────────────────────────
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+
+    function setLoading(btn, loading, text) {
+      btn.disabled = loading;
+      btn.innerHTML = loading ? `<span class="spinner"></span>${text}` : text;
+    }
+
+    function translateError(msg) {
+      if (msg.includes('Invalid login credentials')) return 'E-mail ou senha incorretos.';
+      if (msg.includes('Email not confirmed'))       return 'Confirme seu e-mail antes de entrar.';
+      if (msg.includes('User already registered'))  return 'Este e-mail já está cadastrado. Faça login.';
+      if (msg.includes('Password should be'))       return 'A senha deve ter pelo menos 8 caracteres.';
+      if (msg.includes('rate limit'))               return 'Muitas tentativas. Aguarde alguns minutos.';
+      return msg;
+    }
+
+    // ─── ENTER KEY ─────────────────────────────────────
+    document.getElementById('login-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('btn-login').click();
+    });
+    document.getElementById('signup-password-confirm').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('btn-signup').click();
+    });
+
+    // ─── SE JÁ ESTÁ LOGADO, REDIRECIONA ───────────────
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session && !params.get('expired')) {
+        window.location.replace('app.html');
+      }
+    })();
+  </script>
+</body>
+</html>

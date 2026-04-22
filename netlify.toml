@@ -1,0 +1,59 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Rotas amigáveis
+[[redirects]]
+  from = "/"
+  to   = "/landing.html"
+  status = 200
+
+[[redirects]]
+  from = "/app"
+  to   = "/app.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to   = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to   = "/app.html"
+  status = 200
+
+# API endpoints
+[[redirects]]
+  from = "/api/create-subscription"
+  to   = "/.netlify/functions/create-subscription"
+  status = 200
+
+[[redirects]]
+  from = "/api/mp-webhook"
+  to   = "/.netlify/functions/mp-webhook"
+  status = 200
+
+# Cabeçalhos de segurança para o app
+[[headers]]
+  for = "/app.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/login.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# CORS para as functions
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Authorization, Content-Type"
