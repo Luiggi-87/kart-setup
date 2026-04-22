@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Kart Setup — Entrar</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/security-config.js" defer></script>
   <style>
     :root {
       --bg: #020617;
@@ -260,12 +263,29 @@
 
   <script>
     // ═══════════════════════════════════════════════════
-    // CONFIGURAÇÃO SUPABASE — preencha com suas credenciais
+    // CONFIGURAÇÃO SUPABASE — credenciais via APP_CONFIG
+    // (injetadas pelo Netlify via environment variables)
     // ═══════════════════════════════════════════════════
-    const SUPABASE_URL      = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Aguarda APP_CONFIG ser carregado
+    let sbInitialized = false;
+    let sb = null;
+
+    (async function initSupabase() {
+      let attempts = 0;
+      while (!window.APP_CONFIG && attempts < 50) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+
+      if (!window.APP_CONFIG) {
+        console.error('[SECURITY] Configuration not loaded');
+        return;
+      }
+
+      sb = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
+      sbInitialized = true;
+    })();
 
     // ─── TABS ──────────────────────────────────────────
     const params = new URLSearchParams(location.search);

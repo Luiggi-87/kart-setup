@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Kart Setup — Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/security-config.js" defer></script>
 
   <style>
     :root {
@@ -326,25 +329,23 @@
   <script>
     // Guard imediato: redireciona para login se acessar app.html direto sem autenticação
     (async function immediateGuard() {
-      const SUPABASE_URL = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
-
       // Se não for a página app.html, deixa carregar normalmente
       if (!window.location.pathname.includes('/app')) return;
 
-      // Espera Supabase carregar
+      // Espera Supabase e configuração carregarem
       let attempts = 0;
-      while (!window.supabase && attempts < 50) {
+      while ((!window.supabase || !window.APP_CONFIG) && attempts < 100) {
         await new Promise(r => setTimeout(r, 100));
         attempts++;
       }
 
-      if (!window.supabase) {
+      if (!window.supabase || !window.APP_CONFIG) {
+        console.error('[SECURITY] Failed to load Supabase or configuration');
         window.location.replace('/login.html');
         return;
       }
 
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const sb = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session) {
@@ -742,10 +743,9 @@
 
   <script>
     // ═══════════════════════════════════════════════════
-    // CONFIGURAÇÃO — preencha com suas credenciais Supabase
+    // CONFIGURAÇÃO — credenciais carregadas via APP_CONFIG
+    // (injetadas pelo Netlify via environment variables)
     // ═══════════════════════════════════════════════════
-    const SUPABASE_URL      = 'https://gkjxmsexixrjrvpwidvx.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdranhtc2V4aXhyanJ2cHdpZHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTA4MzYsImV4cCI6MjA5MjAyNjgzNn0.LhXecxSU8luHOFi5OynG3Mn6Qo_mk-8PgscfiVUMs1I';
 
     const CONFIG = {
       SUPABASE_ENABLED: true,
@@ -760,7 +760,20 @@
         return;
       }
 
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Aguarda APP_CONFIG ser carregado
+      let attempts = 0;
+      while (!window.APP_CONFIG && attempts < 50) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+
+      if (!window.APP_CONFIG) {
+        console.error('[SECURITY] Configuration not loaded');
+        window.location.replace('/login.html');
+        return;
+      }
+
+      const sb = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
       window._supabase = sb;
 
       const { data: { session } } = await sb.auth.getSession();
