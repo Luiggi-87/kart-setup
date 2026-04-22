@@ -378,19 +378,22 @@
         const trialEnd = new Date();
         trialEnd.setDate(trialEnd.getDate() + 7);
 
+        // Atualizar apenas status e datas (sem role para não conflitar com RLS)
         const { error } = await sb.from('profiles').update({
           subscription_status: 'trial',
           trial_ends_at: trialEnd.toISOString()
         }).eq('id', session.user.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
-        // Redirecionar para app/admin
-        const redirectUrl = profile?.role === 'admin' ? 'admin.html' : 'app.html';
-        window.location.href = redirectUrl;
+        // Redirecionar para app (role será carregada depois)
+        window.location.href = 'app.html';
       } catch (e) {
         setLoading(btn, false, 'Entrar');
-        showError(document.getElementById('login-error'), 'Erro ao ativar trial. Tente novamente.');
+        showError(document.getElementById('login-error'), 'Erro ao ativar trial. Verifique o console.');
         console.error('Trial error:', e);
       }
     }
