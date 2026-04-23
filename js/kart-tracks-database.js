@@ -403,6 +403,209 @@ const KART_TRACKS_DATABASE = {
         }
       },
 
+      // UBERLÂNDIA - MG
+      jose_carlos_pace_uberlandia: {
+        id: 'jcp-uberlandia',
+        name: 'Kartódromo José Carlos Pace',
+        state: 'MG',
+        city: 'Uberlândia',
+        location_coords: { latitude: -18.911, longitude: -48.277 },
+        founded: 1978,
+        historical_significance: 'Ayrton Senna participou da inauguração',
+        type: 'Professional',
+        reopened_after_renovation: 2022,
+
+        infrastructure: {
+          length_m: 1270,
+          width_m: 8,
+          homologation: 'CBA Oficial',
+          facilities: [
+            'Kart indoor',
+            'Cronometragem eletrônica',
+            'Sinalização eletrônica',
+            'Iluminação para provas noturnas',
+            'Reforma completa realizada'
+          ]
+        },
+
+        characteristics: {
+          surface_type: 'Asfalto de qualidade',
+          difficulty: 'Técnica muito alta',
+          climate: 'Subtropical - Triângulo Mineiro',
+          main_features: [
+            'Um dos traçados mais técnicos do Brasil',
+            'Histórico importante (desde 1978)',
+            'Reinaugurado após 17 anos',
+            'Moderno com iluminação noturna',
+            'Pista versátil para competições'
+          ]
+        },
+
+        tracados: [
+          {
+            id: 'jcp-completo',
+            name: 'Traçado Completo',
+            length_m: 1270,
+            characteristics: [
+              'Traçado principal',
+              'Muito técnico',
+              'Exigente em freadas'
+            ],
+            difficulty: 'Muito Alta'
+          },
+          {
+            id: 'jcp-alternativo',
+            name: 'Traçado Alternativo',
+            length_m: 1000,
+            length_approx: true,
+            characteristics: [
+              'Menos técnico que completo',
+              'Bom para treinamento'
+            ]
+          }
+        ],
+
+        setup_recommendations: {
+          terrain_type: 'Subtropical técnico',
+          notes: 'Pista muito técnica - similar a Nova Odessa em exigência',
+
+          recommended_setups: {
+            dry_technical: {
+              condition: 'Seco, traçado técnico',
+              cambagem: '-1.5° a -2.0°',
+              pressao: '0.75-0.85 bar',
+              altura_dianteira: '33-39mm',
+              altura_traseira: '43-49mm',
+              suspenso_dianteira: 'Média-Dura (5-6)',
+              eixo: 'Médio (Dot 2-3)',
+              toe: '0-1mm OUT',
+              gear_ratio: '68-75 dentes',
+              motivo: 'Traçado técnico exige precisão em freadas'
+            },
+            summer_subtropical: {
+              condition: 'Verão subtropical (dez-mar)',
+              cambagem: '-1.2° a -1.5°',
+              pressao: '0.70-0.78 bar',
+              altura_dianteira: '30-35mm',
+              motivo: 'Calor aumenta temperatura pneus'
+            }
+          },
+
+          critical_notes: [
+            'Pista MUITO técnica - similar a Nova Odessa',
+            'Pontos de freada são críticos - definem volta',
+            'Altura crucial nas curvas técnicas',
+            'Cambagem deve ser máxima para grip',
+            'Ideal para treino técnico avançado'
+          ]
+        }
+      },
+
+      udikart_uberlandia: {
+        id: 'udikart',
+        name: 'UdiKart (Kartódromo Internacional)',
+        state: 'MG',
+        city: 'Uberlândia',
+        location_coords: { latitude: -18.920, longitude: -48.280 },
+        founded: 2024,
+        type: 'Professional / Modern',
+        newest_track: 'Mais novo kartódromo brasileiro',
+
+        infrastructure: {
+          total_area_m2: 30000,
+          length_m: 1200,
+          width_m: 8,
+          tracado_options: 12,
+          facilities: [
+            'Boxes abertos e fechados',
+            'Estacionamento amplo',
+            'Iluminação completa',
+            'Banheiros e vestiário',
+            'Loja de peças',
+            'Espaço de lazer e alimentação'
+          ]
+        },
+
+        characteristics: {
+          surface_type: 'Asfalto com nova tecnologia (alta aderência)',
+          surface_appearance: 'Liso mas com excelente grip',
+          difficulty: 'Técnica média-alta',
+          climate: 'Subtropical',
+          main_features: [
+            'Reta de 220 metros',
+            'Miolo mais travado',
+            'Asfalto de tecnologia nova',
+            '12 traçados diferentes',
+            'Infraestrutura completa e moderna',
+            'Segurança, conforto e comodidade'
+          ]
+        },
+
+        tracados: [
+          {
+            id: 'udikart-1',
+            name: 'Traçado 1 (Principal)',
+            length_m: 1200,
+            characteristics: ['Completo', 'Técnico']
+          },
+          {
+            id: 'udikart-variantes',
+            name: '11 Traçados Variantes',
+            count: 11,
+            characteristics: ['Múltiplas opções']
+          }
+        ],
+
+        setup_recommendations: {
+          terrain_type: 'Asfalto de alta aderência (novo)',
+          notes: 'Asfalto novo com excelente grip',
+
+          recommended_setups: {
+            standard_dry: {
+              condition: 'Padrão, asfalto novo',
+              cambagem: '-1.0° a -1.5°',
+              pressao: '0.78-0.88 bar',
+              altura_dianteira: '32-38mm',
+              altura_traseira: '42-48mm',
+              eixo: 'Médio (Dot 2-3)',
+              toe: '1-2mm OUT',
+              gear_ratio: '70-75 dentes',
+              motivo: 'Asfalto novo oferece bom grip natural'
+            }
+          },
+
+          track_characteristics: [
+            'Reta de 220m permite aceleração máxima',
+            'Miolo travado oferece bom suporte',
+            'Asfalto novo tem excelente aderência',
+            'Ideal para aprendizado técnico'
+          ]
+        }
+      },
+
+      mario_sergio_uberlandia: {
+        id: 'mario-sergio',
+        name: 'Kartódromo Mário Sérgio',
+        state: 'MG',
+        city: 'Uberlândia',
+        type: 'Professional',
+
+        infrastructure: {
+          length_m: 850,
+          width_m: 7
+        },
+
+        characteristics: {
+          surface_type: 'Asfalto',
+          difficulty: 'Técnica média',
+          main_features: [
+            'Curvas desafiadoras',
+            'Referência na cidade',
+            'Compact mas técnico'
+          ]
+        }
+      },
+
       // RIO DE JANEIRO
       kartodroma_niteroi: {
         id: 'niteroi',

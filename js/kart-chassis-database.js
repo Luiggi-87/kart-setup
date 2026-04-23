@@ -122,6 +122,135 @@ const KART_CHASSIS_DATABASE = {
       best_for: ['OK', 'KZ', 'Sprint Racing'],
       features: ['Sniper front end adjustments'],
       references: ['CRG Setup Manual']
+    },
+
+    tony_kart: {
+      name: 'Tony Kart',
+      country: 'Italy',
+      brand_group: 'OTK Group (Flagship)',
+      established: 1960,
+      tube_diameter: '30mm chrome molybdenum',
+      characteristics: 'Sharp front-end response, excellent turn-in grip, versatile setup window',
+      recommended_axle: 'OTK Type N (standard)',
+      best_for: ['OK', 'OKJ', 'KF', 'KZ', 'Micro', 'Mini Rookie'],
+      categories_offered: [
+        'Micro (smallest drivers)',
+        'Mini Rookie USA (junior drivers)',
+        'Mini Kid (9-11 years)',
+        'Cadet',
+        'OK Junior',
+        'OK Senior',
+        'KZ Shifter'
+      ],
+      models: ['Racer 401R', 'Nordix', 'Mini Rookie EV', 'Micro'],
+      suspension_system: {
+        caster_type: 'Eccentric washers (OTK standard)',
+        caster_range: '0°, 90°, 180° adjustable',
+        brake_system: 'BSM4 (latest generation)',
+        seat_system: 'Quick adjustable pedals and sliding seat'
+      },
+      characteristics_by_condition: {
+        high_grip: 'Excellent, natural balance, easy setup',
+        low_grip: 'Sharp enough, maintains responsiveness',
+        wet: 'Predictable in rain'
+      },
+      pros: ['Flagship of OTK group', 'Massive support network', 'Multiple categories available', 'Sharp front-end', 'Professional choice'],
+      cons: ['Premium pricing', 'Can be sensitive to driver input'],
+      professional_achievements: 'Used by many world champions, OTK group success',
+      references: ['Tony Kart Official Website', 'OTK Technical Documentation']
+    },
+
+    mega_kart: {
+      name: 'Mega Kart',
+      country: 'Brazil',
+      established: 1996,
+      homologation: 'CBA - FIA homologated since 1996',
+      tube_diameter: 'Chrome molybdenum construction',
+      characteristics: 'Brazilian engineering, stable and predictable, many suspension adjustment points',
+      best_for: ['All categories', 'Club racing', 'Brazilian championships'],
+      categories_offered: ['Cadet', 'Junior', 'Shifter (6-speed)', 'Indoor racing'],
+      models: [
+        'Mega X (13-18cv)',
+        'Mega MX (modernized, 13-18cv)',
+        'Mega models for different powers'
+      ],
+      suspension_setup: {
+        torsion_bars: 'Multiple options',
+        suspension_points: 'Many adjustment points for fine-tuning',
+        seat: 'Adjustable position',
+        brakes: 'Disc brakes (hydraulic capable)'
+      },
+      engine_partnership: 'Honda engine preparation (credentialed since 2008)',
+      available_motors: ['5.5cv (Cadet)', '13cv (prepared)', '18cv (prepared)', '21cv (high performance)'],
+      carenage: 'Reinforced fiberglass',
+      advantages: [
+        '100+ titles nationwide since 1996',
+        'Stable geometry recognized by market',
+        'Over 60 units sold first year',
+        'Great suspension adjustment points',
+        'Brazilian engineering for local conditions'
+      ],
+      achievements: '100+ Brazilian championship titles',
+      ideal_for_climate: 'Brazilian tropical conditions, well-suited',
+      pros: ['Brazilian manufacturer', '100+ titles proven', 'Good value', 'Local support', 'Fine-tuning possible'],
+      cons: ['Less international support than European brands'],
+      references: ['Mega Kart Official Website', 'Portal Kart Motor Brasil']
+    },
+
+    mini_kart: {
+      name: 'Mini Kart (Riomar)',
+      country: 'Brazil',
+      manufacturer_name: 'Mecânica Riomar (Mário de Carvalho)',
+      location: 'São Paulo, Brazil',
+      established: 1977,
+      historical_significance: 'Designed by Fittipaldi brothers in 1966, revolutionary design',
+      homologation: 'FIA homologated (M2 model in 2008)',
+      tube_diameter: 'Chrome molybdenum construction',
+      characteristics: 'Smaller, lower seating position than standard, technical and responsive',
+      best_for: ['Cadet', 'Junior', 'Indoor racing', 'Sprint categories'],
+      categories_offered: [
+        'Cadete (children)',
+        'Indoor (transmission by toothed belt)',
+        'Sixspeed (hydraulic brakes, 6-speed)',
+        'M2 (FIA homologated, 3-bearing rear axle, ventilated discs)'
+      ],
+      models: [
+        'Mini-Garelli (1977, for <11 years old)',
+        'Mini Cadete (current generation)',
+        'Mini Indoor (belt transmission)',
+        'Mini Sixspeed (with hydraulic brakes)',
+        'Mini M2 (modern FIA spec)'
+      ],
+      design_philosophy: {
+        wheelbase: 'Shorter than standard',
+        seating: 'More reclined position',
+        handling: 'More responsive than larger karts'
+      },
+      brake_system: {
+        indoor_models: 'Mechanical brake',
+        sixspeed_models: 'Hydraulic disc brakes',
+        m2_modern: 'Hydraulic disc brakes - front and rear'
+      },
+      suspension: {
+        rear_axle_m2: 'Three-bearing setup',
+        disc_brakes: 'Ventilated for better cooling',
+        configuration: 'Fine-tuned for junior/cadete drivers'
+      },
+      design_legacy: 'Revolutionary 1966 design by Fittipaldi brothers, still relevant',
+      professional_history: 'Produced by Riomar since 1967',
+      manufacturing: '100% Brazilian production',
+      advantages: [
+        'Historic and proven design',
+        'FIA homologated models',
+        'Perfect for children/juniors',
+        'Brazilian manufacturing',
+        'Responsive handling',
+        'Multiple configuration options'
+      ],
+      best_for_driver: 'Young drivers, technical development, indoor racing',
+      pros: ['Historic design (since 1966)', 'Perfect for juniors', 'FIA homologated', 'Made in Brazil', 'Very responsive'],
+      cons: ['Limited international exposure', 'Mainly Brazilian market'],
+      references: ['Riomar Official Information', 'Portal Kart Motor Brasil', 'FIA Technical Regulations']
     }
   },
 
