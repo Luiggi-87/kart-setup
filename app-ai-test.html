@@ -812,19 +812,27 @@
     </div>
   </div>
 
+  <script src="/js/kart-chassis-database.js" defer></script>
+
   <script>
     const STORAGE_KEY = 'kartAI_analyses_v1';
     const API_ENDPOINT = '/.netlify/functions/analyze-setup';
     let currentAnalysis = null;
+    let DATABASE_LOADED = false;
 
-    // Reference data for best practices
-    const KART_REFERENCE_DATA = {
-      pressures: { optimal_min: 0.75, optimal_max: 0.85, range_min: 0.6, range_max: 1.0 },
-      cambagem: { optimal_min: -1.5, optimal_max: -1.0, range_min: -2.5, range_max: -0.5 },
-      bitola: { narrow_min: 1100, narrow_max: 1150, wide_min: 1150, wide_max: 1250 },
-      altura_dianteira: { optimal_min: 30, optimal_max: 40, range_min: 20, range_max: 50 },
-      altura_traseira: { optimal_min: 40, optimal_max: 50, range_min: 30, range_max: 60 }
-    };
+    // Wait for database to load
+    function onDatabaseReady() {
+      DATABASE_LOADED = true;
+      console.log('✅ Kart Chassis Database loaded successfully');
+      console.log('Professional data available from ' + KART_CHASSIS_DATABASE.metadata.sources.length + ' sources');
+    }
+
+    // Check if database loaded
+    window.addEventListener('load', () => {
+      if (typeof KART_CHASSIS_DATABASE !== 'undefined') {
+        onDatabaseReady();
+      }
+    });
 
     // Tab switching
     function switchTab(tabName) {

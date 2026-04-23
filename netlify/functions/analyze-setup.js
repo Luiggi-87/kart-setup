@@ -13,56 +13,110 @@ const requestCounts = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const RATE_LIMIT_MAX = 5; // 5 requests per minute
 
-// Reference data for best practices
+// Reference data for best practices (from KART_CHASSIS_DATABASE)
 const KART_REFERENCE_DATA = {
   pressures: {
     optimal_min: 0.75,
     optimal_max: 0.85,
     range_min: 0.6,
     range_max: 1.0,
-    description: 'Pressões de pneu otimais em bar'
+    pressure_difference: 'Front 0.05-0.10 bar lower than rear',
+    description: 'Pressões de pneu otimais em bar',
+    cold_to_hot_increase: '0.2-0.3 bar',
+    by_condition: {
+      cold_track: { pressure: '0.80-0.85 bar', reason: 'Higher pressure helps tire heat up faster' },
+      high_grip: { pressure: '0.65-0.75 bar', reason: 'Lower pressure prevents overheating' },
+      low_grip: { pressure: '0.75-0.85 bar', reason: 'Balanced for all conditions' }
+    }
   },
+
   cambagem: {
     optimal_min: -1.5,
     optimal_max: -1.0,
     range_min: -2.5,
     range_max: -0.5,
-    description: 'Cambagem em graus'
+    description: 'Cambagem em graus',
+    measurement_method: 'Millimeters at wheel rim (~8-12mm = ~1°)',
+    effects_too_negative: ['Excessive corner grip', 'Inner tire wear'],
+    effects_optimal: ['Balanced grip', 'Even tire wear'],
+    kz_range: '-1.0° to -2.0°'
   },
+
   bitola: {
     narrow_min: 1100,
     narrow_max: 1150,
     wide_min: 1150,
     wide_max: 1250,
-    description: 'Bitola em mm'
+    description: 'Bitola em mm',
+    note: 'Wider tracks improve stability'
   },
+
   altura_dianteira: {
     optimal_min: 30,
     optimal_max: 40,
     range_min: 20,
     range_max: 50,
-    description: 'Altura dianteira em mm'
+    description: 'Altura dianteira em mm',
+    ok_category: '30-40mm',
+    kz_category: '35-45mm'
   },
+
   altura_traseira: {
     optimal_min: 40,
     optimal_max: 50,
     range_min: 30,
     range_max: 60,
-    description: 'Altura traseira em mm'
+    description: 'Altura traseira em mm',
+    ok_category: '40-50mm',
+    kz_category: '45-55mm'
   },
+
   suspensao_dianteira: {
     optimal_min: 4,
     optimal_max: 6,
     range_min: 1,
     range_max: 10,
-    description: 'Dureza suspenção dianteira'
+    description: 'Dureza suspenção dianteira',
+    options: ['Flat (softest)', 'Round 1.0mm', 'Round 1.5mm', 'Round 2.0mm (stiffest)']
   },
+
   suspensao_traseira: {
     optimal_min: 4,
     optimal_max: 6,
     range_min: 1,
     range_max: 10,
-    description: 'Dureza suspenção traseira'
+    description: 'Dureza suspenção traseira',
+    blade_configuration: '470mm blade, horizontal position recommended'
+  },
+
+  caster: {
+    range_min: 4,
+    range_max: 8,
+    description: 'Ângulo do eixo de direção em graus',
+    dry_conditions: '6-8°',
+    wet_conditions: 'Maximum available',
+    effects: {
+      increase: ['More turn-in grip', 'Sharper steering'],
+      decrease: ['Lighter steering', 'Less feedback']
+    }
+  },
+
+  toe: {
+    range_min: -3,
+    range_max: 3,
+    description: 'Ângulo das rodas em mm',
+    optimal: '0-3mm toe-out',
+    high_speed: '0-1mm (prefer zero)',
+    sprint: '1-3mm out'
+  },
+
+  axle_hardness: {
+    types: ['Soft (Dot 1)', 'Medium (Dot 2)', 'Hard (Dot 3)', 'Very Hard (Dot 4)'],
+    standard: 'Medium (most versatile)',
+    ok_classes: 'Soft to Medium (lighter, freer handling)',
+    kz_classes: 'Medium to Hard (transfer torque)',
+    cold_track: 'Soft-Medium',
+    hot_track: 'Medium-Hard'
   }
 };
 
@@ -137,51 +191,110 @@ function sanitizeSetup(data) {
   return sanitized;
 }
 
-// Build analysis prompts
+// Build analysis prompts with professional racing data
 function buildPrompts(setupData) {
   const setupJson = JSON.stringify(setupData, null, 2);
   const refDataJson = JSON.stringify(KART_REFERENCE_DATA, null, 2);
 
-  const prompt1 = `You are an expert kart racing engineer. Analyze this kart setup and provide behavioral diagnosis:
+  const professionalContext = `
+## PROFESSIONAL KART RACING GUIDELINES (2024-2026)
 
-SETUP DATA:
+### Tire Pressure Critical Facts:
+- Cold pressure: 0.65-0.70 bar
+- Race pressure: 0.75-0.85 bar
+- Hot pressure: 0.95-1.05 bar (can increase 0.2-0.3 bar during run)
+- Front ~0.05-0.10 bar lower than rear (typical: 0.75F / 0.80R)
+- Too high pressure: center tread overheats, reduces grip
+- Too low pressure: shoulder wear, unpredictable handling
+
+### Camber Recommendations by Category:
+- Cadet (8-12): -0.5° to -1.5°
+- Junior (12-15): -1.0° to -1.5°
+- OK Senior (15+): -1.0° to -1.5° (light setup to prevent sticking)
+- KZ Senior (15+): -1.0° to -2.0° (stiffer to transfer torque)
+
+### Chassis Category Differences:
+- OK: 30mm tubes, slides freely, needs light setup, doesn't stick
+- KZ: 32mm tubes, needs greater grip, stiffer setup recommended
+- Weight minimum OK: 150kg | KZ: 170kg | KZ2: 175kg
+
+### Axle Hardness Guidelines:
+- Soft (Dot 1): Cold track, low-power classes, flexes for compliance
+- Medium (Dot 2): Default, most versatile, works in most conditions
+- Hard (Dot 3): Hot track, high-power (KZ), forces energy to tires
+- Very Hard (Dot 4): Extreme grip conditions
+
+### Professional Setup Patterns:
+- High grip track: Lower pressure (0.65-0.75), harder axle, more camber
+- Low grip track: Higher pressure (0.80-0.85), softer axle, less camber
+- Cold track: Increase pressure to help tire warm up
+- Wet: Use maximum caster, slightly higher pressure
+
+### Top Chassis Manufacturers:
+- CRG: Most world championships, medium axle standard, works in long races
+- OTK Group (Tony Kart, Kosmic, Exprit): Sharp front response, massive support
+- Birel ART: Forgiving setup window, predictable, great for learning
+- Praga: Reliable, adjustable CCS system
+`;
+
+  const prompt1 = `You are a professional FIA karting engineer with 15+ years of world championship experience.
+Analyze this kart setup using current 2024-2026 professional racing standards:
+
+${professionalContext}
+
+ACTUAL SETUP DATA FROM DRIVER:
 ${setupJson}
 
-REFERENCE DATA (optimal ranges):
+REFERENCE RANGES (from professional data):
 ${refDataJson}
 
-Provide analysis in this JSON structure:
+Provide detailed behavioral analysis as JSON:
 {
-  "tendencia_principal": "oversteer" | "understeer" | "neutro",
-  "descricao": "detailed analysis of setup behavior",
-  "aceleracao": "expected acceleration response",
-  "frenagem": "expected braking response",
-  "curva": "expected cornering behavior",
-  "condicoes_pista": ["seco", "chuva", "borracha", etc]
+  "tendencia_principal": "oversteer|understeer|neutro",
+  "descricao": "2-3 sentence analysis of how this setup will behave on track",
+  "aceleracao": "Describe acceleration response and potential issues",
+  "frenagem": "Describe braking stability and balance",
+  "curva": "Describe cornering tendency and grip characteristics",
+  "condicoes_pista": ["array of ideal conditions: seco, chuva, borracha, baixa_aderencia, etc"]
 }
 
-Respond ONLY with valid JSON, no other text.`;
+Use ONLY professional racing terminology. Reference manufacturer characteristics where relevant.
+Respond ONLY with valid JSON, no markdown, no explanation.`;
 
-  const prompt2 = `You are an expert kart racing engineer. Compare this setup against professional racing best practices:
+  const prompt2 = `You are a professional FIA karting engineer. Compare this setup against World Championship standards.
 
-SETUP DATA:
+${professionalContext}
+
+ACTUAL SETUP DATA:
 ${setupJson}
 
-REFERENCE DATA (optimal ranges):
+PROFESSIONAL REFERENCE DATA:
 ${refDataJson}
 
-Provide analysis in this JSON structure:
+Identify deviations from professional best practices:
 {
-  "campos_otimos": ["field1", "field2"],
+  "campos_otimos": [
+    "List fields that match professional standards exactly"
+  ],
   "campos_desviam": [
-    {"campo": "fieldname", "valor_entrada": "value", "recomendacao": "range", "razao": "why"}
+    {
+      "campo": "field name (e.g., pressao_fl)",
+      "valor_entrada": "actual value with unit",
+      "recomendacao": "professional recommendation with range",
+      "razao": "Why this change improves performance (1 sentence)"
+    }
   ],
   "campos_alerta": [
-    {"campo": "fieldname", "motivo": "reason for alert"}
+    {
+      "campo": "critical field name",
+      "motivo": "Specific risk or performance issue (e.g., 'Very low, risk of frame bottoming')"
+    }
   ]
 }
 
-Respond ONLY with valid JSON, no other text.`;
+Focus on fields that meaningfully impact performance.
+Only flag true deviations, not minor variations.
+Respond ONLY with valid JSON.`;
 
   return { prompt1, prompt2 };
 }
