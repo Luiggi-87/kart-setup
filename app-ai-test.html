@@ -825,6 +825,64 @@
       font-size: 13px;
     }
 
+    /* Track Condition Modal */
+    #trackConditionModal {
+      display: none !important;
+    }
+
+    #trackConditionModal.active {
+      display: flex !important;
+    }
+
+    .condition-btn {
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .condition-btn:hover {
+      background: rgba(0, 255, 136, 0.15);
+      border-color: var(--accent);
+    }
+
+    .condition-btn strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .condition-btn small {
+      display: block;
+      color: var(--text-softer);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .action-button {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
       .pistas-content {
@@ -1431,6 +1489,22 @@
       </div>
     </div>
 
+    <!-- Modal: Select Track Condition -->
+    <div id="trackConditionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+      <div style="background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 500px; width: 90%;">
+        <h2 style="color: var(--accent); margin-bottom: 16px;">🏁 Selecione a Condição da Pista</h2>
+        <p style="color: var(--text-soft); margin-bottom: 20px; font-size: 13px;">Escolha as condições esperadas para carregar um setup recomendado:</p>
+
+        <div id="conditionOptions" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <!-- Será preenchido dinamicamente -->
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button onclick="closeTrackConditionModal()" class="btn btn-secondary" style="flex: 1;">✕ Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab: History -->
     <div id="history" class="tab-content">
       <div id="historyContent">
@@ -1827,6 +1901,153 @@
     // Pistas Tab Functions
     let allTracks = [];
     let selectedTrack = null;
+    let pendingTrackSetup = null;
+
+    // Mapping between track recommendations and form fields
+    const SETUP_FIELD_MAPPING = {
+      'pressao_fl': 'pressao',
+      'pressao_fr': 'pressao',
+      'pressao_rl': 'pressao',
+      'pressao_rr': 'pressao',
+      'cambagem_esq': 'cambagem',
+      'cambagem_dir': 'cambagem',
+      'altura_dianteira': 'altura_dianteira',
+      'altura_traseira': 'altura_traseira',
+      'suspensao_dianteira': 'suspenso_dianteira',
+      'suspensao_traseira': 'suspenso_traseira',
+      'toe_in': 'toe',
+      'toe_out': 'toe',
+      'tipo_eixo_detalhado': 'eixo',
+      'gear_ratio_detalhado': 'gear_ratio',
+      'inclinacao_banco': 'bancar'
+    };
+
+    function openTrackConditionModal(trackId) {
+      const track = allTracks.find(t => t.id === trackId);
+      if (!track || !track.setup_recommendations) {
+        showMessage('⚠️ Esta pista não possui recomendações de setup', 'warning');
+        return;
+      }
+
+      pendingTrackSetup = track;
+
+      // Get available conditions
+      const setupRecs = track.setup_recommendations.recommended_setups || {};
+      const conditions = Object.keys(setupRecs);
+
+      if (conditions.length === 0) {
+        showMessage('⚠️ Nenhuma recomendação disponível para esta pista', 'warning');
+        return;
+      }
+
+      // Condition descriptions
+      const conditionDescriptions = {
+        'dry_high_grip': { label: '☀️ Seco com Alto Grip', desc: 'Asfalto novo, grippy, primeiras voltas' },
+        'dry_low_grip': { label: '☀️ Seco com Baixo Grip', desc: 'Asfalto gasto, final do evento' },
+        'rain': { label: '🌧️ Chuva', desc: 'Pista molhada, pneus de chuva' },
+        'tropical_hot_humid': { label: '🔥 Tropical Quente', desc: 'Clima quente e úmido, alta temperatura' },
+        'standard_dry': { label: '⚙️ Padrão Seco', desc: 'Condição padrão, temperatura normal' }
+      };
+
+      // Build condition options
+      let html = '';
+      conditions.forEach(condition => {
+        const desc = conditionDescriptions[condition] || { label: condition, desc: 'Recomendação customizada' };
+        const setupData = setupRecs[condition];
+        const conditionLabel = setupData.condition || desc.label;
+
+        html += `
+          <button type="button" class="condition-btn" onclick="loadTrackSetup('${trackId}', '${condition}')">
+            <strong>${desc.label}</strong>
+            <span>${conditionLabel}</span>
+            <small>${desc.desc}</small>
+          </button>
+        `;
+      });
+
+      document.getElementById('conditionOptions').innerHTML = html;
+      const modal = document.getElementById('trackConditionModal');
+      modal.classList.add('active');
+    }
+
+    function closeTrackConditionModal() {
+      document.getElementById('trackConditionModal').classList.remove('active');
+      pendingTrackSetup = null;
+    }
+
+    function loadTrackSetup(trackId, conditionKey) {
+      const track = allTracks.find(t => t.id === trackId);
+      if (!track) {
+        showMessage('❌ Pista não encontrada', 'error');
+        return;
+      }
+
+      const setupRec = track.setup_recommendations?.recommended_setups?.[conditionKey];
+      if (!setupRec) {
+        showMessage('❌ Setup não encontrado para esta condição', 'error');
+        return;
+      }
+
+      // Parse pressure values
+      const pressureMatch = (setupRec.pressao || '0.75').match(/[\d.]+/);
+      const pressure = pressureMatch ? parseFloat(pressureMatch[0]) : 0.75;
+
+      // Parse cambagem (handle range like "-1.5° a -2.0°")
+      const cambagem = setupRec.cambagem || '-1.5';
+      const cambagematches = cambagem.match(/-?[\d.]+/g);
+      const cambagemaValue = cambagematches ? parseFloat(cambagematches[0]) : -1.5;
+
+      // Parse altura
+      const alturaMatch = (setupRec.altura_dianteira || '35').match(/[\d.]+/);
+      const alturaDianteira = alturaMatch ? parseInt(alturaMatch[0]) : 35;
+
+      const alturaTraMatch = (setupRec.altura_traseira || '45').match(/[\d.]+/);
+      const alturaTraseira = alturaTraMatch ? parseInt(alturaTraMatch[0]) : 45;
+
+      // Populate form fields
+      document.getElementById('pressao_fl').value = pressure;
+      document.getElementById('pressao_fr').value = pressure;
+      document.getElementById('pressao_rl').value = Math.min(pressure + 0.05, 1.0);
+      document.getElementById('pressao_rr').value = Math.min(pressure + 0.05, 1.0);
+
+      document.getElementById('cambagem_esq').value = cambagemaValue;
+      document.getElementById('cambagem_dir').value = cambagemaValue;
+
+      document.getElementById('altura_dianteira').value = alturaDianteira;
+      document.getElementById('altura_traseira').value = alturaTraseira;
+
+      // Toe settings
+      if (setupRec.toe && setupRec.toe.includes('OUT')) {
+        document.getElementById('toe_out').value = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
+        document.getElementById('toe_in').value = '0';
+      } else if (setupRec.toe && setupRec.toe.includes('IN')) {
+        document.getElementById('toe_in').value = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
+        document.getElementById('toe_out').value = '0';
+      }
+
+      // Gear ratio
+      if (setupRec.gear_ratio && document.getElementById('gear_ratio_detalhado')) {
+        const gearMatch = setupRec.gear_ratio.match(/\d+/);
+        if (gearMatch) {
+          document.getElementById('gear_ratio_detalhado').value = gearMatch[0];
+        }
+      }
+
+      // Close modal and show success message
+      closeTrackConditionModal();
+      showMessage(`✅ Setup para "${track.name}" (${setupRec.condition}) carregado com sucesso!`, 'success');
+
+      // Switch to inputs tab
+      setTimeout(() => {
+        document.getElementById('inputs').classList.add('active');
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.querySelectorAll('.tab-content').forEach((t, i) => {
+          if (i !== 0) t.classList.remove('active');
+        });
+        // Scroll to top of form
+        document.querySelector('.form-container')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
 
     function initializePistas() {
       if (typeof KART_TRACKS_DATABASE === 'undefined') {
@@ -2036,6 +2257,20 @@
       }
 
       html += `</div>`;
+
+      // Add action button if there are setup recommendations
+      if (track.setup_recommendations?.recommended_setups && Object.keys(track.setup_recommendations.recommended_setups).length > 0) {
+        html += `
+          <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+            <button type="button" class="action-button" onclick="openTrackConditionModal('${track.id}')">
+              🔧 Carregar Setup Recomendado
+            </button>
+            <small style="display: block; color: var(--text-softer); text-align: center; margin-top: 8px;">
+              Clique para selecionar a condição de pista
+            </small>
+          </div>
+        `;
+      }
 
       detailContainer.innerHTML = html;
     }
