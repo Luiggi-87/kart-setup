@@ -216,6 +216,58 @@
       margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: bold;
+      cursor: help;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .tooltip-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(5, 8, 18, 0.95);
+      color: var(--text);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .tooltip-help {
+      display: block;
+      font-size: 11px;
+      color: var(--text-softer);
+      margin-top: 4px;
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
+      line-height: 1.4;
     }
 
     input,
@@ -765,13 +817,282 @@
             </div>
           </div>
 
+          <!-- Fabricante (para adaptar campos) -->
+          <div class="form-section">
+            <div class="section-title">🏭 Fabricante & Modelo</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fabricante">
+                  Fabricante do Chassis
+                  <span class="tooltip-icon" data-tooltip="Selecione o fabricante do chassis para otimizar análise">?</span>
+                </label>
+                <select id="fabricante" name="fabricante" onchange="updateFormByManufacturer()">
+                  <option value="">-- Selecionar Fabricante --</option>
+                  <option value="crg">CRG</option>
+                  <option value="otk">OTK (Tony Kart, Kosmic, Exprit, FA)</option>
+                  <option value="birel">Birel ART</option>
+                  <option value="kosmic">Kosmic (Standalone)</option>
+                  <option value="praga">Praga</option>
+                  <option value="parolin">Parolin</option>
+                  <option value="outro">Outro</option>
+                </select>
+                <span class="tooltip-help">CRG usa washers | OTK usa excêntricos | Birel/Praga usam CCS dial</span>
+              </div>
+              <div class="form-group">
+                <label for="modelo">
+                  Modelo do Chassis
+                  <span class="tooltip-icon" data-tooltip="Modelo exato do chassis">?</span>
+                </label>
+                <input type="text" id="modelo" name="modelo" placeholder="Ex: KF1, OK, KZ, KZ2">
+                <span class="tooltip-help">Ajuda a identificar categoria e especificações do chassis</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bitola & Geometria Avançada -->
+          <div class="form-section">
+            <div class="section-title">📐 Bitola & Geometria Avançada</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="caster_esq">
+                  Caster Esquerdo
+                  <span class="tooltip-icon" data-tooltip="Ângulo do eixo de direção">?</span>
+                </label>
+                <select id="caster_esq" name="caster_esq">
+                  <option value="">-- Selecionar --</option>
+                  <option value="I/I">CRG: I/I (Mínimo)</option>
+                  <option value="II/II">CRG: II/II (Padrão)</option>
+                  <option value="II/III">CRG: II/III (Progressivo)</option>
+                  <option value="III/III">CRG: III/III (Máximo)</option>
+                  <option value="0">OTK: 0° (Posição inicial)</option>
+                  <option value="90">OTK: 90° (Meia volta)</option>
+                  <option value="180">OTK: 180° (Volta completa)</option>
+                  <option value="pos1">Birel/Kosmic: Posição 1</option>
+                  <option value="pos2">Birel/Kosmic: Posição 2</option>
+                  <option value="pos3">Birel/Kosmic: Posição 3</option>
+                  <option value="pos4">Birel/Kosmic: Posição 4</option>
+                </select>
+                <span class="tooltip-help">Aumentar = mais grip de entrada | Diminuir = steering mais leve</span>
+              </div>
+              <div class="form-group">
+                <label for="caster_dir">
+                  Caster Direito
+                  <span class="tooltip-icon" data-tooltip="Ângulo do eixo de direção">?</span>
+                </label>
+                <select id="caster_dir" name="caster_dir">
+                  <option value="">-- Selecionar --</option>
+                  <option value="I/I">CRG: I/I (Mínimo)</option>
+                  <option value="II/II">CRG: II/II (Padrão)</option>
+                  <option value="II/III">CRG: II/III (Progressivo)</option>
+                  <option value="III/III">CRG: III/III (Máximo)</option>
+                  <option value="0">OTK: 0° (Posição inicial)</option>
+                  <option value="90">OTK: 90° (Meia volta)</option>
+                  <option value="180">OTK: 180° (Volta completa)</option>
+                  <option value="pos1">Birel/Kosmic: Posição 1</option>
+                  <option value="pos2">Birel/Kosmic: Posição 2</option>
+                  <option value="pos3">Birel/Kosmic: Posição 3</option>
+                  <option value="pos4">Birel/Kosmic: Posição 4</option>
+                </select>
+                <span class="tooltip-help">Aumentar = mais grip de entrada | Diminuir = steering mais leve</span>
+              </div>
+              <div class="form-group">
+                <label for="toe_in">
+                  Toe IN Dianteiro (mm)
+                  <span class="tooltip-icon" data-tooltip="Convergência das rodas">?</span>
+                </label>
+                <select id="toe_in" name="toe_in">
+                  <option value="0">0 mm (Reto)</option>
+                  <option value="1">1 mm (Convergência leve)</option>
+                  <option value="2">2 mm (Convergência média)</option>
+                  <option value="3">3 mm (Convergência máxima)</option>
+                </select>
+                <span class="tooltip-help">Mais grip na entrada | Limita a velocidade máxima</span>
+              </div>
+              <div class="form-group">
+                <label for="toe_out">
+                  Toe OUT Dianteiro (mm)
+                  <span class="tooltip-icon" data-tooltip="Divergência das rodas">?</span>
+                </label>
+                <select id="toe_out" name="toe_out">
+                  <option value="0">0 mm (Reto)</option>
+                  <option value="1">1 mm (Divergência leve)</option>
+                  <option value="2">2 mm (Divergência média)</option>
+                  <option value="3">3 mm (Divergência máxima)</option>
+                </select>
+                <span class="tooltip-help">Melhor para velocidade máxima | Menos grip em entrada</span>
+              </div>
+              <div class="form-group">
+                <label for="ackerman">
+                  Ackerman (Geometria)
+                  <span class="tooltip-icon" data-tooltip="Sistema de raio de curva">?</span>
+                </label>
+                <select id="ackerman" name="ackerman">
+                  <option value="">-- Selecionar --</option>
+                  <option value="lower">Kosmic: Lower Holes (Máximo Ackerman)</option>
+                  <option value="upper">Kosmic: Upper Holes (Reduzido)</option>
+                  <option value="f0">Kosmic: Pitman F0 (Extra Grip)</option>
+                  <option value="padrao">Padrão (CRG, OTK, Birel, Praga)</option>
+                  <option value="alto">Tie-rod Alto (Reduzido)</option>
+                  <option value="baixo">Tie-rod Baixo (Máximo)</option>
+                </select>
+                <span class="tooltip-help">Afeta responsividade e raio de curva | Crítico para diagnóstico</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pneus, Altura & Eixo (Expandido) -->
+          <div class="form-section">
+            <div class="section-title">🛞 Pneus, Altura, Eixo & Banco</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="tipo_eixo_detalhado">
+                  Tipo de Eixo
+                  <span class="tooltip-icon" data-tooltip="Dureza do eixo traseiro">?</span>
+                </label>
+                <select id="tipo_eixo_detalhado" name="tipo_eixo_detalhado">
+                  <option value="">-- Selecionar --</option>
+                  <option value="dot1">Dot 1 (Muitíssimo Macio)</option>
+                  <option value="dot2">Dot 2 (Macio)</option>
+                  <option value="dot3">Dot 3 (Médio - Padrão)</option>
+                  <option value="dot4">Dot 4 (Firme)</option>
+                  <option value="dot5">Dot 5 (Muito Firme)</option>
+                  <option value="otk_n">OTK Type N (Médio - Padrão)</option>
+                  <option value="custom">Custom (descrever abaixo)</option>
+                </select>
+                <span class="tooltip-help">Mais macio = mais flexível | Mais firme = melhor transferência de torque</span>
+              </div>
+              <div class="form-group">
+                <label for="eixo_descricao">
+                  Descrição (Custom)
+                  <span class="tooltip-icon" data-tooltip="Para opções customizadas">?</span>
+                </label>
+                <input type="text" id="eixo_descricao" name="eixo_descricao" placeholder="Ex: OTK N, macio | Praga soft">
+                <span class="tooltip-help">Use se selecionou "Custom" acima</span>
+              </div>
+              <div class="form-group">
+                <label for="inclinacao_banco">
+                  Inclinação do Banco
+                  <span class="tooltip-icon" data-tooltip="Posição peso do piloto">?</span>
+                </label>
+                <select id="inclinacao_banco" name="inclinacao_banco">
+                  <option value="">-- Selecionar --</option>
+                  <option value="muito_frente">Muito Frente (Máximo grip dianteiro)</option>
+                  <option value="frente">Frente (Normal, turn-in)</option>
+                  <option value="centro">Centro (Equilibrado)</option>
+                  <option value="tras">Trás (Mais tração traseira)</option>
+                  <option value="muito_tras">Muito Trás (Máxima tração, professional)</option>
+                </select>
+                <span class="tooltip-help">Afeta distribuição de peso | Frente = mais understeer | Trás = mais oversteer</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Para-choques (NOVO) -->
+          <div class="form-section">
+            <div class="section-title">🪜 Para-choques (Bump Stops)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="parachoques_dianteiro_altura">
+                  Para-choque Diant. - Altura
+                  <span class="tooltip-icon" data-tooltip="Altura do bump stop frontal">?</span>
+                </label>
+                <select id="parachoques_dianteiro_altura" name="parachoques_dianteiro_altura">
+                  <option value="">-- Selecionar --</option>
+                  <option value="15">15 mm (Muito macio)</option>
+                  <option value="20">20 mm (Macio)</option>
+                  <option value="25">25 mm (Médio)</option>
+                  <option value="30">30 mm (Firme)</option>
+                </select>
+                <span class="tooltip-help">Menor = mais compliance | Maior = chassis mais rígido</span>
+              </div>
+              <div class="form-group">
+                <label for="parachoques_dianteiro_rigidez">
+                  Para-choque Diant. - Rigidez
+                  <span class="tooltip-icon" data-tooltip="Torque do parafuso">?</span>
+                </label>
+                <input type="range" id="parachoques_dianteiro_rigidez" name="parachoques_dianteiro_rigidez" min="1" max="10" value="5" style="width: 100%">
+                <small style="color: var(--text-softer);">1 = Macio | 5 = Médio | 10 = Muito Firme</small>
+              </div>
+              <div class="form-group">
+                <label for="parachoques_traseiro_altura">
+                  Para-choque Tras. - Altura
+                  <span class="tooltip-icon" data-tooltip="Altura do bump stop traseiro">?</span>
+                </label>
+                <select id="parachoques_traseiro_altura" name="parachoques_traseiro_altura">
+                  <option value="">-- Selecionar --</option>
+                  <option value="20">20 mm (Muito macio)</option>
+                  <option value="25">25 mm (Macio)</option>
+                  <option value="30">30 mm (Médio)</option>
+                  <option value="35">35 mm (Firme)</option>
+                </select>
+                <span class="tooltip-help">Normalmente 5-10mm maior que dianteiro</span>
+              </div>
+              <div class="form-group">
+                <label for="parachoques_traseiro_rigidez">
+                  Para-choque Tras. - Rigidez
+                  <span class="tooltip-icon" data-tooltip="Torque do parafuso">?</span>
+                </label>
+                <input type="range" id="parachoques_traseiro_rigidez" name="parachoques_traseiro_rigidez" min="1" max="10" value="5" style="width: 100%">
+                <small style="color: var(--text-softer);">1 = Macio | 5 = Médio | 10 = Muito Firme</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transmissão (NOVO) -->
+          <div class="form-section">
+            <div class="section-title">⚙️ Transmissão (Gear Ratio)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="coroa_dentes">
+                  Coroa (Dentes)
+                  <span class="tooltip-icon" data-tooltip="Número de dentes da coroa">?</span>
+                </label>
+                <select id="coroa_dentes" name="coroa_dentes">
+                  <option value="">-- Selecionar --</option>
+                  <option value="50">50 dentes (Máxima velocidade, pista longa)</option>
+                  <option value="60">60 dentes (Velocidade alta)</option>
+                  <option value="65">65 dentes (Equilibrado, velocidade)</option>
+                  <option value="70">70 dentes (Equilibrado)</option>
+                  <option value="75">75 dentes (Equilibrado, aceleração)</option>
+                  <option value="80">80 dentes (Aceleração alta)</option>
+                  <option value="85">85 dentes (Máxima aceleração, pista curta)</option>
+                </select>
+                <span class="tooltip-help">Menos dentes = mais velocidade | Mais dentes = mais aceleração</span>
+              </div>
+              <div class="form-group">
+                <label for="observacao_relacao">
+                  Contexto de Pista
+                  <span class="tooltip-icon" data-tooltip="Tipo de pista">?</span>
+                </label>
+                <select id="observacao_relacao" name="observacao_relacao">
+                  <option value="">-- Selecionar --</option>
+                  <option value="pista_longa">Pista longa (velocidade máxima prioritária)</option>
+                  <option value="pista_media">Pista média (equilibrado)</option>
+                  <option value="pista_curta">Pista curta (aceleração prioritária)</option>
+                  <option value="muitas_curvas">Muitas curvas (aceleração repetida)</option>
+                  <option value="equilibrado">Equilibrado (não especializado)</option>
+                  <option value="custom">Custom (descrever abaixo)</option>
+                </select>
+                <span class="tooltip-help">Ajuda a determinar gear ratio ideal</span>
+              </div>
+              <div class="form-group">
+                <label for="observacao_relacao_custom">
+                  Observação Customizada
+                  <span class="tooltip-icon" data-tooltip="Detalhes adicionais">?</span>
+                </label>
+                <input type="text" id="observacao_relacao_custom" name="observacao_relacao_custom" placeholder="Ex: Pista rápida mas saída lenta">
+                <span class="tooltip-help">Use se selecionou "Custom"</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Configurações Adicionais -->
           <div class="form-section">
             <div class="section-title">⚡ Configurações Adicionais</div>
             <div class="form-grid">
               <div class="form-group">
-                <label for="comentarios">Comentários / Notas</label>
-                <input type="text" id="comentarios" name="comentarios" placeholder="Descreva o comportamento esperado...">
+                <label for="comentarios">Comentários / Observações</label>
+                <input type="text" id="comentarios" name="comentarios" placeholder="Descreva o comportamento esperado, condições de pista, etc...">
               </div>
             </div>
           </div>
@@ -874,12 +1195,25 @@
       }
     }
 
+    // Update form by manufacturer
+    function updateFormByManufacturer() {
+      const mfg = document.getElementById('fabricante').value;
+      console.log('Fabricante selecionado:', mfg);
+      // Can add dynamic UI changes here in future
+      // For now, all options are visible (better UX)
+    }
+
     // Get form data
     function getFormData() {
       const formData = new FormData(document.getElementById('setupForm'));
       const data = {};
       for (let [key, value] of formData.entries()) {
-        data[key] = value === '' ? null : isNaN(value) ? value : parseFloat(value);
+        // Handle range sliders (rigidez) as numbers
+        if (key.includes('rigidez')) {
+          data[key] = parseInt(value);
+        } else {
+          data[key] = value === '' ? null : isNaN(value) ? value : parseFloat(value);
+        }
       }
       return data;
     }

@@ -387,6 +387,129 @@ const KART_CHASSIS_DATABASE = {
   // ========================================
 
   setup_parameters: {
+    caster: {
+      description: 'Forward/backward angle of steering axis',
+      unit: 'Variable by manufacturer',
+
+      manufacturer_systems: {
+        crg: {
+          system: 'Washer adjusters',
+          positions: ['I/I', 'II/II', 'III/III', 'II/III'],
+          default: 'II/II (standard)',
+          effect: {
+            I_I: 'Minimum caster (light steering)',
+            II_II: 'Standard, recommended starting position',
+            II_III: 'Progressive adjustment',
+            III_III: 'Maximum caster (more turn-in grip)'
+          },
+          notes: 'Each position change affects steering feel significantly. Casters very sensitive compared to camber.'
+        },
+
+        otk: {
+          system: 'Eccentric washers (rotatable)',
+          positions: ['0°', '90°', '180°'],
+          adjustment_method: 'Rotate eccentric washer',
+          effect: {
+            '0': 'Initial position',
+            '90': 'Half turn (fine-tuning, moderate change)',
+            '180': 'Full rotation (maximum change)',
+            'half_with_concentric': 'Mix eccentric + concentric for progressive adjustment'
+          },
+          notes: '180° rotation = big change, 90° = moderate fine-tuning'
+        },
+
+        birel_art: {
+          system: 'CCS Dial System (Camber Caster System)',
+          positions: 'Numbered dial (1-8 or similar)',
+          range: '±4° adjustment possible',
+          method: 'Rotate dial, lock with screw',
+          notes: 'One-piece bushing, adjustable from top of stub axle, new 2026 design'
+        },
+
+        kosmic: {
+          system: 'Eccentric washers + CCS compatible',
+          positions: ['Position 1', 'Position 2', 'Position 3', 'Position 4'],
+          adjustment: 'Rotate and lock in place'
+        },
+
+        praga: {
+          system: 'CCS System (similar to Birel)',
+          range: '±2° to ±4° possible',
+          method: 'Upper bushing adjustment + lower lock'
+        }
+      },
+
+      recommendations: {
+        dry_conditions: '6-8°',
+        wet_conditions: 'Maximum available',
+        effects_increase: ['More turn-in grip', 'Sharper steering', 'More feedback'],
+        effects_decrease: ['Lighter steering', 'Less feedback', 'More understeer']
+      }
+    },
+
+    ackerman: {
+      description: 'Geometry of inside/outside wheel turning radiuses',
+      unit: 'Position or hole selection',
+
+      manufacturer_systems: {
+        kosmic: {
+          system: 'Two mounting hole positions',
+          lower_holes: {
+            position: 'Lower set of holes (standard)',
+            effect: 'Maximum Ackerman',
+            grip: 'More responsive, better turning radius',
+            steering: 'More effective'
+          },
+          upper_holes: {
+            position: 'Upper set of holes (alternative)',
+            effect: 'Reduced Ackerman',
+            grip: 'Lighter steering, less effective',
+            steering: 'Lighter but less responsive'
+          },
+          alternative_pitman: {
+            model: 'PN 0005.F0 long pitman arm',
+            effect: 'Both holes further from column = INCREASES grip',
+            use: 'Extra grip desired, high-speed circuits'
+          }
+        },
+
+        otk_others: {
+          system: 'Tie-rod height/position adjustment',
+          high_position: 'Reduced Ackerman',
+          low_position: 'Maximum Ackerman (standard)',
+          effect_on_handling: 'Changes turning radius and front responsiveness'
+        },
+
+        crg_praga_standard: {
+          system: 'Standard column position',
+          note: 'Less adjustable than Kosmic, uses standard steering geometry'
+        }
+      }
+    },
+
+    toe: {
+      description: 'Convergence/divergence of front wheels',
+      unit: 'millimeters (mm)',
+
+      specifications: {
+        toe_in: 'Wheels pointing inward (0-3mm typical)',
+        toe_out: 'Wheels pointing outward (0-3mm typical)',
+        zero: 'Wheels straight (0mm)'
+      },
+
+      effects: {
+        toe_out: ['Better turn-in response', 'Helps corner entry', 'Can cause instability if excessive'],
+        zero: ['Better high-speed straight-line', 'Stable'],
+        toe_in: ['Worse turn-in', 'Not typically used in karts']
+      },
+
+      recommendations: {
+        high_speed_tracks: '0-1mm (prefer zero)',
+        sprint_tracks: '1-3mm out',
+        road_courses: '2-3mm out'
+      }
+    },
+
     camber: {
       description: 'Angle of wheel relative to vertical',
       unit: 'degrees (°)',
@@ -493,6 +616,111 @@ const KART_CHASSIS_DATABASE = {
         'Center tread cold = too little pressure',
         'Even wear = optimal pressure'
       ]
+    },
+
+    bump_stop: {
+      description: 'Para-choque (bumper) stiffness and height',
+      manufacturer: 'All manufacturers use similar system',
+
+      height_specifications: {
+        front: {
+          minimum: '15mm',
+          standard: '20-25mm',
+          maximum: '30mm',
+          effect: 'Lower = softer suspension, Higher = stiffer'
+        },
+        rear: {
+          minimum: '20mm',
+          standard: '25-30mm',
+          maximum: '35mm',
+          effect: 'Lower = softer suspension, Higher = stiffer'
+        }
+      },
+
+      rigidity_scale: {
+        description: '1-10 scale (bolt torque tightness)',
+        soft: '1-3 (low torque, chassis flexes more)',
+        medium: '4-6 (normal torque, standard)',
+        firm: '7-10 (high torque, chassis very stiff)',
+        adjustment: 'Tighten bolts to increase stiffness'
+      },
+
+      effects: {
+        increase_rigidity: ['More grip', 'Stiffer chassis', 'Less chassis flex', 'More responsive'],
+        decrease_rigidity: ['Softer ride', 'More chassis compliance', 'Better for bumpy tracks', 'Less jerky']
+      },
+
+      notes: 'Para-choque is part of chassis torsion tuning, works with torsion bars'
+    },
+
+    gear_ratio: {
+      description: 'Transmission ratio (sprocket teeth selection)',
+      unit: 'Number of teeth on axle sprocket',
+
+      teeth_options: {
+        50: { teeth: 50, use: 'Maximum top speed', pista: 'Long, high-speed circuits', accel: 'Low' },
+        60: { teeth: 60, use: 'High speed focus', pista: 'Fast circuits with few slow sections', accel: 'Medium-Low' },
+        65: { teeth: 65, use: 'Speed-focused balanced', pista: 'Mixed pistas', accel: 'Medium' },
+        70: { teeth: 70, use: 'Fully balanced', pista: 'Standard for most tracks', accel: 'Medium' },
+        75: { teeth: 75, use: 'Acceleration-focused balanced', pista: 'Mixed pistas with more corners', accel: 'Medium-High' },
+        80: { teeth: 80, use: 'High acceleration', pista: 'Many tight corners', accel: 'High' },
+        85: { teeth: 85, use: 'Maximum acceleration', pista: 'Short, technical circuits', accel: 'Very High' }
+      },
+
+      formula: 'Gear Ratio = Axle Sprocket Teeth / Engine Sprocket Teeth',
+      example: '70 teeth / 10 engine teeth = 7.0 gear ratio',
+
+      selection_guide: {
+        long_fast_pista: '50-60 dentes (velocity priority)',
+        medium_pista: '65-75 dentes (balanced)',
+        short_technical: '75-85 dentes (acceleration priority)',
+        decision_factor: 'Balance between top speed needed and acceleration frequency'
+      }
+    },
+
+    seat_inclination: {
+      description: 'Weight distribution by seat position',
+      unit: 'Position forward/backward/angle',
+
+      positions: {
+        muito_frente: {
+          name: 'Very Forward',
+          effect_weight: 'Maximum weight on front wheels',
+          grip: 'Maximum front grip',
+          disadvantage: 'Reduced rear traction',
+          best_for: 'Aggressive turn-in (junior drivers)'
+        },
+        frente: {
+          name: 'Forward',
+          effect_weight: 'More weight on front',
+          grip: 'Good front grip',
+          balance: 'Slightly oversteer biased',
+          best_for: 'Normal turn-in response'
+        },
+        centro: {
+          name: 'Center',
+          effect_weight: 'Balanced weight',
+          grip: 'Balanced front/rear',
+          balance: 'Neutral handling',
+          best_for: 'Most situations, baseline setup'
+        },
+        tras: {
+          name: 'Back',
+          effect_weight: 'More weight on rear',
+          grip: 'Good rear traction',
+          balance: 'Slightly understeer biased',
+          best_for: 'Smooth acceleration, high-grip tracks'
+        },
+        muito_tras: {
+          name: 'Very Back',
+          effect_weight: 'Maximum weight on rear',
+          grip: 'Maximum rear traction',
+          disadvantage: 'Reduced front grip',
+          best_for: 'Professional, maximum power transfer'
+        }
+      },
+
+      notes: 'Works together with height adjustments to fine-tune balance'
     },
 
     suspension: {

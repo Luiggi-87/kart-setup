@@ -198,6 +198,70 @@ function buildPrompts(setupData) {
 
   const professionalContext = `
 ## PROFESSIONAL KART RACING GUIDELINES (2024-2026)
+## MANUFACTURER-SPECIFIC ANALYSIS
+
+### CASTER Adjustment by Manufacturer:
+**CRG System (Washer Adjusters):**
+- I/I = Minimum caster (light steering)
+- II/II = Standard (recommended starting)
+- II/III = Progressive
+- III/III = Maximum (most turn-in grip)
+Effect: Each position significantly affects steering feel. Casters VERY sensitive.
+
+**OTK System (Eccentric Washers):**
+- 0° = Initial position
+- 90° = Half turn (moderate fine-tuning)
+- 180° = Full rotation (maximum change)
+Effect: 180° = big change, 90° = fine-tuning
+Option: Combine eccentric + concentric washer for progressive adjustment
+
+**Birel ART / Kosmic (CCS Dial):**
+- Positions 1-8 (numbered dial)
+- Range: ±4° adjustment possible
+- Method: Rotate dial, lock with screw
+Effect: Smooth, infinitely adjustable within range
+
+**Praga (CCS System):**
+- Similar to Birel, ±2° to ±4° possible
+- Upper bushing + lower lock method
+
+### ACKERMAN Geometry Effects:
+**Kosmic Two-Hole System:**
+- Lower holes (default) = MAXIMUM Ackerman = more responsive, better turning radius
+- Upper holes = REDUCED Ackerman = lighter steering, less effective
+- Pitman PN 0005.F0 (long) = INCREASES grip (both holes further from column)
+
+**Effect on Handling:**
+- Maximum Ackerman: Aggressive turn-in, responsive steering, better for technical sections
+- Reduced Ackerman: Lighter steering, less responsive, easier for junior drivers
+- Critical for understeer vs oversteer diagnosis!
+
+### TOE Specifications:
+- Toe IN: 0-3mm (wheels converging inward)
+- Toe OUT: 0-3mm (wheels diverging outward)
+- Dry/High-speed: Prefer 0-1mm (straight preferred)
+- Sprint/Technical: 1-3mm out (better turn-in)
+
+### PARA-CHOQUE (Bump Stop) Analysis:
+**Front Height:** 15-30mm | **Rear Height:** 20-35mm
+**Rigidity Scale:** 1-10 (1=soft with low bolt torque | 10=firm with maximum torque)
+**Effect:** Higher = stiffer chassis, more responsive | Lower = softer compliance
+**Key:** Works WITH torsion bars for total chassis stiffness
+
+### GEAR RATIO (Coroa Selection):
+- 50 dentes: Max top speed (long, fast pistas only)
+- 60-65: Speed-focused (fast circuits with few slow sections)
+- 70: Fully balanced (standard, works most situations)
+- 75-80: Acceleration-focused (more corners/technical)
+- 85 dentes: Max acceleration (short, technical circuits)
+**Formula:** Axle teeth / Engine teeth = Gear Ratio
+
+### SEAT INCLINATION Effects:
+- Muito Frente: Max front grip, max understeer tendency (junior)
+- Frente: Normal turn-in, slightly understeer biased
+- Centro: Perfectly balanced, neutral
+- Trás: More rear traction, slightly oversteer biased
+- Muito Trás: Max rear traction, max oversteer tendency (professional)
 
 ### Tire Pressure Critical Facts:
 - Cold pressure: 0.65-0.70 bar
@@ -231,54 +295,66 @@ function buildPrompts(setupData) {
 - Wet: Use maximum caster, slightly higher pressure
 
 ### Top Chassis Manufacturers:
-- CRG: Most world championships, medium axle standard, works in long races
-- OTK Group (Tony Kart, Kosmic, Exprit): Sharp front response, massive support
-- Birel ART: Forgiving setup window, predictable, great for learning
-- Praga: Reliable, adjustable CCS system
+- CRG: Most world championships, Washer caster system, medium axle standard
+- OTK Group (Tony Kart, Kosmic, Exprit): Eccentric washer caster, sharp front response, massive support
+- Birel ART: CCS dial system, forgiving setup window, predictable, great for learning
+- Praga: CCS similar to Birel, reliable, adjustable
+- Kosmic: Standalone two-hole Ackerman, OTK eccentric washers, proven geometry
+- Parolin: 28mm tubes, adaptable to all conditions
 `;
 
   const prompt1 = `You are a professional FIA karting engineer with 15+ years of world championship experience.
-Analyze this kart setup using current 2024-2026 professional racing standards:
+Analyze this ADVANCED kart setup using current 2024-2026 professional racing standards.
+Focus on manufacturer-specific parameters: Caster system, Ackerman geometry, Para-choques, Gear Ratio, Seat position.
 
 ${professionalContext}
 
-ACTUAL SETUP DATA FROM DRIVER:
-${setupJson}
-
-REFERENCE RANGES (from professional data):
-${refDataJson}
-
-Provide detailed behavioral analysis as JSON:
-{
-  "tendencia_principal": "oversteer|understeer|neutro",
-  "descricao": "2-3 sentence analysis of how this setup will behave on track",
-  "aceleracao": "Describe acceleration response and potential issues",
-  "frenagem": "Describe braking stability and balance",
-  "curva": "Describe cornering tendency and grip characteristics",
-  "condicoes_pista": ["array of ideal conditions: seco, chuva, borracha, baixa_aderencia, etc"]
-}
-
-Use ONLY professional racing terminology. Reference manufacturer characteristics where relevant.
-Respond ONLY with valid JSON, no markdown, no explanation.`;
-
-  const prompt2 = `You are a professional FIA karting engineer. Compare this setup against World Championship standards.
-
-${professionalContext}
-
-ACTUAL SETUP DATA:
+ACTUAL ADVANCED SETUP DATA FROM DRIVER:
 ${setupJson}
 
 PROFESSIONAL REFERENCE DATA:
 ${refDataJson}
 
-Identify deviations from professional best practices:
+Provide detailed behavioral analysis as JSON:
+{
+  "tendencia_principal": "oversteer|understeer|neutro",
+  "descricao": "2-3 sentence analysis of how this setup will behave, considering Caster+Ackerman+Para-choque interaction",
+  "aceleracao": "Describe acceleration (consider gear ratio, para-choque rigidity, seat position)",
+  "frenagem": "Describe braking stability (weight distribution from seat, para-choque height)",
+  "curva": "Describe cornering (Caster+Ackerman+Toe combined effect on turn-in and mid-corner)",
+  "condicoes_pista": ["ideal conditions based on setup: seco, chuva, borracha, grippy, low_grip, etc"],
+  "observaciones_manufacturero": "If applicable, comment on how this setup aligns or differs from manufacturer specs (CRG, OTK, Birel, Kosmic, Praga)"
+}
+
+Use ONLY professional racing terminology. Reference manufacturer characteristics where relevant.
+Analyze combined effects (e.g., Caster II/III + Ackerman upper = less aggressive turn-in).
+Respond ONLY with valid JSON, no markdown, no explanation.`;
+
+  const prompt2 = `You are a professional FIA karting engineer. Compare this ADVANCED setup against World Championship standards.
+Focus on manufacturer-specific parameters and their interactions.
+
+${professionalContext}
+
+ACTUAL ADVANCED SETUP DATA:
+${setupJson}
+
+PROFESSIONAL REFERENCE DATA:
+${refDataJson}
+
+Identify deviations from professional best practices, especially for:
+- Caster settings by manufacturer (CRG vs OTK vs Birel differences)
+- Ackerman geometry effects (understeer vs oversteer)
+- Para-choque height/rigidity combo (chassis stiffness)
+- Gear ratio vs pista type (acceleration vs top speed)
+- Seat position vs weight distribution
+
 {
   "campos_otimos": [
     "List fields that match professional standards exactly"
   ],
   "campos_desviam": [
     {
-      "campo": "field name (e.g., pressao_fl)",
+      "campo": "field name (e.g., caster_esq, parachoques_rigidez)",
       "valor_entrada": "actual value with unit",
       "recomendacao": "professional recommendation with range",
       "razao": "Why this change improves performance (1 sentence)"
@@ -287,12 +363,14 @@ Identify deviations from professional best practices:
   "campos_alerta": [
     {
       "campo": "critical field name",
-      "motivo": "Specific risk or performance issue (e.g., 'Very low, risk of frame bottoming')"
+      "motivo": "Specific risk or performance issue (e.g., 'Caster III/III + Ackerman upper = too aggressive turn-in risk')"
     }
-  ]
+  ],
+  "manufacturer_notes": "If relevant, comment on manufacturer-specific adjustments or combinations that might be off"
 }
 
-Focus on fields that meaningfully impact performance.
+Focus on fields that meaningfully impact performance and manufacturer specs.
+Analyze COMBINATIONS of settings (Caster + Ackerman + Para-choque work together).
 Only flag true deviations, not minor variations.
 Respond ONLY with valid JSON.`;
 
