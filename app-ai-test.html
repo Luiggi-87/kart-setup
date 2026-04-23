@@ -825,12 +825,12 @@
       font-size: 13px;
     }
 
-    /* Track Condition Modal */
-    #trackConditionModal {
+    /* Setup Wizard Modal */
+    #setupWizardModal {
       display: none !important;
     }
 
-    #trackConditionModal.active {
+    #setupWizardModal.active {
       display: flex !important;
     }
 
@@ -1489,18 +1489,32 @@
       </div>
     </div>
 
-    <!-- Modal: Select Track Condition -->
-    <div id="trackConditionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-      <div style="background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 500px; width: 90%;">
-        <h2 style="color: var(--accent); margin-bottom: 16px;">🏁 Selecione a Condição da Pista</h2>
-        <p style="color: var(--text-soft); margin-bottom: 20px; font-size: 13px;">Escolha as condições esperadas para carregar um setup recomendado:</p>
+    <!-- Modal: Setup Wizard (Track Condition + Kart Model) -->
+    <div id="setupWizardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+      <div style="background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <h2 style="color: var(--accent); margin-bottom: 8px;">⚙️ Configurar Setup da Pista</h2>
+        <p style="color: var(--text-softer); margin-bottom: 20px; font-size: 12px;">Selecione a condição e o modelo do kart para carregar a configuração recomendada</p>
 
-        <div id="conditionOptions" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-          <!-- Será preenchido dinamicamente -->
+        <!-- Step 1: Condition -->
+        <div id="wizardStep1" style="display: block;">
+          <h3 style="color: var(--accent); font-size: 14px; margin-bottom: 12px;">1️⃣ Condição da Pista</h3>
+          <div id="conditionOptions" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <!-- Será preenchido dinamicamente -->
+          </div>
+        </div>
+
+        <!-- Step 2: Kart Model -->
+        <div id="wizardStep2" style="display: none;">
+          <h3 style="color: var(--accent); font-size: 14px; margin-bottom: 12px;">2️⃣ Modelo do Kart</h3>
+          <p style="color: var(--text-softer); font-size: 12px; margin-bottom: 12px;">Selecione o fabricante/modelo para um setup mais preciso:</p>
+          <div id="kartModelOptions" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <!-- Será preenchido dinamicamente -->
+          </div>
         </div>
 
         <div style="display: flex; gap: 12px;">
-          <button onclick="closeTrackConditionModal()" class="btn btn-secondary" style="flex: 1;">✕ Cancelar</button>
+          <button id="wizardPrevBtn" onclick="wizardPreviousStep()" class="btn btn-secondary" style="flex: 1; display: none;">← Voltar</button>
+          <button onclick="closeSetupWizard()" class="btn btn-secondary" style="flex: 1;">✕ Cancelar</button>
         </div>
       </div>
     </div>
@@ -1901,35 +1915,39 @@
     // Pistas Tab Functions
     let allTracks = [];
     let selectedTrack = null;
-    let pendingTrackSetup = null;
-
-    // Mapping between track recommendations and form fields
-    const SETUP_FIELD_MAPPING = {
-      'pressao_fl': 'pressao',
-      'pressao_fr': 'pressao',
-      'pressao_rl': 'pressao',
-      'pressao_rr': 'pressao',
-      'cambagem_esq': 'cambagem',
-      'cambagem_dir': 'cambagem',
-      'altura_dianteira': 'altura_dianteira',
-      'altura_traseira': 'altura_traseira',
-      'suspensao_dianteira': 'suspenso_dianteira',
-      'suspensao_traseira': 'suspenso_traseira',
-      'toe_in': 'toe',
-      'toe_out': 'toe',
-      'tipo_eixo_detalhado': 'eixo',
-      'gear_ratio_detalhado': 'gear_ratio',
-      'inclinacao_banco': 'bancar'
+    let wizardState = {
+      track: null,
+      condition: null,
+      kartModel: null,
+      step: 1
     };
 
-    function openTrackConditionModal(trackId) {
+    // Kart models for wizard
+    const KART_MODELS = {
+      'mega_kart': { name: '🇧🇷 Mega Kart (Brasil)', group: 'Local' },
+      'tony_kart': { name: '🇮🇹 Tony Kart', group: 'OTK Group' },
+      'mini_kart': { name: '🇧🇷 Mini Kart (Riomar)', group: 'Local' },
+      'crg': { name: '🇮🇹 CRG', group: 'OTK Group' },
+      'otk': { name: '🇮🇹 OTK (Kosmic/Exprit)', group: 'OTK Group' },
+      'birel': { name: '🇮🇹 Birel ART', group: 'Birel' },
+      'praga': { name: '🇨🇿 Praga', group: 'Czech' },
+      'generic': { name: '⚙️ Padrão (Genérico)', group: 'Standard' }
+    };
+
+    function openSetupWizard(trackId) {
       const track = allTracks.find(t => t.id === trackId);
       if (!track || !track.setup_recommendations) {
         showMessage('⚠️ Esta pista não possui recomendações de setup', 'warning');
         return;
       }
 
-      pendingTrackSetup = track;
+      // Reset wizard state
+      wizardState = {
+        track: track,
+        condition: null,
+        kartModel: null,
+        step: 1
+      };
 
       // Get available conditions
       const setupRecs = track.setup_recommendations.recommended_setups || {};
@@ -1942,8 +1960,8 @@
 
       // Condition descriptions
       const conditionDescriptions = {
-        'dry_high_grip': { label: '☀️ Seco com Alto Grip', desc: 'Asfalto novo, grippy, primeiras voltas' },
-        'dry_low_grip': { label: '☀️ Seco com Baixo Grip', desc: 'Asfalto gasto, final do evento' },
+        'dry_high_grip': { label: '☀️ Seco - Alto Grip', desc: 'Asfalto novo, grippy, primeiras voltas' },
+        'dry_low_grip': { label: '☀️ Seco - Baixo Grip', desc: 'Asfalto gasto, final do evento' },
         'rain': { label: '🌧️ Chuva', desc: 'Pista molhada, pneus de chuva' },
         'tropical_hot_humid': { label: '🔥 Tropical Quente', desc: 'Clima quente e úmido, alta temperatura' },
         'standard_dry': { label: '⚙️ Padrão Seco', desc: 'Condição padrão, temperatura normal' }
@@ -1957,7 +1975,7 @@
         const conditionLabel = setupData.condition || desc.label;
 
         html += `
-          <button type="button" class="condition-btn" onclick="loadTrackSetup('${trackId}', '${condition}')">
+          <button type="button" class="condition-btn" onclick="selectCondition('${condition}')">
             <strong>${desc.label}</strong>
             <span>${conditionLabel}</span>
             <small>${desc.desc}</small>
@@ -1966,76 +1984,180 @@
       });
 
       document.getElementById('conditionOptions').innerHTML = html;
-      const modal = document.getElementById('trackConditionModal');
+      showWizardStep(1);
+      const modal = document.getElementById('setupWizardModal');
       modal.classList.add('active');
     }
 
-    function closeTrackConditionModal() {
-      document.getElementById('trackConditionModal').classList.remove('active');
-      pendingTrackSetup = null;
+    function selectCondition(conditionKey) {
+      wizardState.condition = conditionKey;
+      showWizardStep(2);
     }
 
-    function loadTrackSetup(trackId, conditionKey) {
-      const track = allTracks.find(t => t.id === trackId);
-      if (!track) {
-        showMessage('❌ Pista não encontrada', 'error');
+    function selectKartModel(modelKey) {
+      wizardState.kartModel = modelKey;
+      loadCompleteSetup();
+    }
+
+    function showWizardStep(stepNum) {
+      wizardState.step = stepNum;
+
+      // Show/hide steps
+      document.getElementById('wizardStep1').style.display = stepNum === 1 ? 'block' : 'none';
+      document.getElementById('wizardStep2').style.display = stepNum === 2 ? 'block' : 'none';
+
+      // Show/hide back button
+      document.getElementById('wizardPrevBtn').style.display = stepNum > 1 ? 'block' : 'none';
+
+      // Build kart model options if step 2
+      if (stepNum === 2) {
+        let html = '';
+        for (const [key, model] of Object.entries(KART_MODELS)) {
+          html += `
+            <button type="button" class="condition-btn" onclick="selectKartModel('${key}')">
+              <strong>${model.name}</strong>
+              <span>Grupo: ${model.group}</span>
+              <small>Carregará recomendações otimizadas para este modelo</small>
+            </button>
+          `;
+        }
+        document.getElementById('kartModelOptions').innerHTML = html;
+      }
+    }
+
+    function wizardPreviousStep() {
+      if (wizardState.step > 1) {
+        showWizardStep(wizardState.step - 1);
+      }
+    }
+
+    function closeSetupWizard() {
+      document.getElementById('setupWizardModal').classList.remove('active');
+      wizardState = { track: null, condition: null, kartModel: null, step: 1 };
+    }
+
+    function loadCompleteSetup() {
+      if (!wizardState.track || !wizardState.condition) {
+        showMessage('❌ Erro ao carregar setup', 'error');
         return;
       }
 
-      const setupRec = track.setup_recommendations?.recommended_setups?.[conditionKey];
+      const track = wizardState.track;
+      const setupRec = track.setup_recommendations?.recommended_setups?.[wizardState.condition];
+
       if (!setupRec) {
         showMessage('❌ Setup não encontrado para esta condição', 'error');
         return;
       }
 
-      // Parse pressure values
-      const pressureMatch = (setupRec.pressao || '0.75').match(/[\d.]+/);
-      const pressure = pressureMatch ? parseFloat(pressureMatch[0]) : 0.75;
-
-      // Parse cambagem (handle range like "-1.5° a -2.0°")
-      const cambagem = setupRec.cambagem || '-1.5';
-      const cambagematches = cambagem.match(/-?[\d.]+/g);
-      const cambagemaValue = cambagematches ? parseFloat(cambagematches[0]) : -1.5;
-
-      // Parse altura
-      const alturaMatch = (setupRec.altura_dianteira || '35').match(/[\d.]+/);
-      const alturaDianteira = alturaMatch ? parseInt(alturaMatch[0]) : 35;
-
-      const alturaTraMatch = (setupRec.altura_traseira || '45').match(/[\d.]+/);
-      const alturaTraseira = alturaTraMatch ? parseInt(alturaTraMatch[0]) : 45;
-
-      // Populate form fields
-      document.getElementById('pressao_fl').value = pressure;
-      document.getElementById('pressao_fr').value = pressure;
-      document.getElementById('pressao_rl').value = Math.min(pressure + 0.05, 1.0);
-      document.getElementById('pressao_rr').value = Math.min(pressure + 0.05, 1.0);
-
-      document.getElementById('cambagem_esq').value = cambagemaValue;
-      document.getElementById('cambagem_dir').value = cambagemaValue;
-
-      document.getElementById('altura_dianteira').value = alturaDianteira;
-      document.getElementById('altura_traseira').value = alturaTraseira;
-
-      // Toe settings
-      if (setupRec.toe && setupRec.toe.includes('OUT')) {
-        document.getElementById('toe_out').value = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
-        document.getElementById('toe_in').value = '0';
-      } else if (setupRec.toe && setupRec.toe.includes('IN')) {
-        document.getElementById('toe_in').value = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
-        document.getElementById('toe_out').value = '0';
+      // Helper function to parse numeric values from strings
+      function parseNumber(value, defaultVal = 0) {
+        if (!value) return defaultVal;
+        const match = String(value).match(/-?[\d.]+/);
+        return match ? parseFloat(match[0]) : defaultVal;
       }
 
-      // Gear ratio
-      if (setupRec.gear_ratio && document.getElementById('gear_ratio_detalhado')) {
-        const gearMatch = setupRec.gear_ratio.match(/\d+/);
-        if (gearMatch) {
-          document.getElementById('gear_ratio_detalhado').value = gearMatch[0];
+      // Parse pressure
+      const pressure = parseNumber(setupRec.pressao, 0.75);
+      const pressureRear = parseNumber(setupRec.pressao_traseira || setupRec.pressao, pressure + 0.05);
+
+      // Parse cambagem
+      const cambagem = parseNumber(setupRec.cambagem, -1.5);
+
+      // Parse alturas
+      const alturaDiant = parseNumber(setupRec.altura_dianteira, 35);
+      const alturaTras = parseNumber(setupRec.altura_traseira, 45);
+
+      // Parse suspensão
+      const suspDiant = parseNumber(setupRec.suspenso_dianteira, 5);
+      const suspTras = parseNumber(setupRec.suspenso_traseira, 5);
+
+      // --- PREENCHER TODOS OS CAMPOS ---
+
+      // 1. PRESSÕES
+      setFieldValue('pressao_fl', pressure);
+      setFieldValue('pressao_fr', pressure);
+      setFieldValue('pressao_rl', Math.min(pressureRear, 1.0));
+      setFieldValue('pressao_rr', Math.min(pressureRear, 1.0));
+
+      // 2. CAMBAGEM E ALINHAMENTO
+      setFieldValue('cambagem_esq', cambagem);
+      setFieldValue('cambagem_dir', cambagem);
+      setFieldValue('convergencia', parseNumber(setupRec.convergencia, 0));
+      setFieldValue('anti_roll', parseNumber(setupRec.anti_roll, 5));
+
+      // 3. ALTURA E SUSPENSÃO
+      setFieldValue('altura_dianteira', alturaDiant);
+      setFieldValue('altura_traseira', alturaTras);
+      setFieldValue('suspensao_dianteira', suspDiant);
+      setFieldValue('suspensao_traseira', suspTras);
+
+      // 4. BITOLA
+      setFieldValue('bitola', parseNumber(setupRec.bitola, 1150));
+      setFieldValue('distancia_dianteira', parseNumber(setupRec.distancia_dianteira, 1100));
+      setFieldValue('distancia_traseira', parseNumber(setupRec.distancia_traseira, 1100));
+
+      // 5. PNEUS
+      if (setupRec.pneu_dianteiro) setFieldValue('pneu_dianteiro', setupRec.pneu_dianteiro);
+      if (setupRec.pneu_traseiro) setFieldValue('pneu_traseiro', setupRec.pneu_traseiro);
+      setFieldValue('temperatura_pneu', parseNumber(setupRec.temperatura_pneu, 80));
+
+      // 6. FREIOS
+      setFieldValue('disco_dianteiro', parseNumber(setupRec.disco_dianteiro, 1.6));
+      setFieldValue('disco_traseiro', parseNumber(setupRec.disco_traseiro, 1.2));
+      if (setupRec.pastilha_freio) setFieldValue('pastilha_freio', setupRec.pastilha_freio);
+
+      // 7. MOTOR (se disponível no setup rec)
+      if (setupRec.motor) setFieldValue('motor', setupRec.motor);
+      if (setupRec.carburador) setFieldValue('carburador', setupRec.carburador);
+      if (setupRec.oleo_motor) setFieldValue('óleo_motor', setupRec.oleo_motor);
+      setFieldValue('ignição', parseNumber(setupRec.ignição, 20));
+
+      // 8. FABRICANTE & MODELO
+      setFieldValue('fabricante', wizardState.kartModel);
+
+      // 9. BITOLA & GEOMETRIA AVANÇADA
+      if (setupRec.caster_esq) setFieldValue('caster_esq', setupRec.caster_esq);
+      if (setupRec.caster_dir) setFieldValue('caster_dir', setupRec.caster_dir);
+
+      // 10. TOE
+      if (setupRec.toe) {
+        if (setupRec.toe.includes('OUT')) {
+          const toeVal = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
+          setFieldValue('toe_out', toeVal);
+          setFieldValue('toe_in', '0');
+        } else if (setupRec.toe.includes('IN')) {
+          const toeVal = setupRec.toe.includes('3') ? '3' : (setupRec.toe.includes('2') ? '2' : '1');
+          setFieldValue('toe_in', toeVal);
+          setFieldValue('toe_out', '0');
         }
       }
 
+      // 11. ACKERMAN
+      if (setupRec.ackerman) setFieldValue('ackerman', setupRec.ackerman);
+
+      // 12. TIPO DE EIXO
+      if (setupRec.eixo) setFieldValue('tipo_eixo_detalhado', setupRec.eixo);
+      if (setupRec.eixo_descricao) setFieldValue('eixo_descricao', setupRec.eixo_descricao);
+
+      // 13. INCLINAÇÃO DO BANCO
+      if (setupRec.bancar) setFieldValue('inclinacao_banco', setupRec.bancar);
+
+      // 14. PARA-CHOQUES (BUMP STOPS)
+      if (setupRec.para_choque_diant_altura) setFieldValue('para_choque_diant_altura', setupRec.para_choque_diant_altura);
+      if (setupRec.para_choque_diant_rigidez) setFieldValue('para_choque_diant_rigidez', parseNumber(setupRec.para_choque_diant_rigidez, 5));
+      if (setupRec.para_choque_tras_altura) setFieldValue('para_choque_tras_altura', setupRec.para_choque_tras_altura);
+      if (setupRec.para_choque_tras_rigidez) setFieldValue('para_choque_tras_rigidez', parseNumber(setupRec.para_choque_tras_rigidez, 5));
+
+      // 15. TRANSMISSÃO
+      if (setupRec.gear_ratio) setFieldValue('gear_ratio_detalhado', parseNumber(setupRec.gear_ratio));
+      if (setupRec.contexto_pista) setFieldValue('contexto_pista', setupRec.contexto_pista);
+      if (setupRec.observacoes) setFieldValue('comentarios', setupRec.observacoes);
+
       // Close modal and show success message
-      closeTrackConditionModal();
-      showMessage(`✅ Setup para "${track.name}" (${setupRec.condition}) carregado com sucesso!`, 'success');
+      closeSetupWizard();
+      const kartModelName = KART_MODELS[wizardState.kartModel]?.name || 'Genérico';
+      showMessage(`✅ Setup completo carregado: ${track.name} • ${kartModelName}`, 'success');
 
       // Switch to inputs tab
       setTimeout(() => {
@@ -2047,6 +2169,14 @@
         // Scroll to top of form
         document.querySelector('.form-container')?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
+    }
+
+    // Helper function to safely set field values
+    function setFieldValue(fieldId, value) {
+      const field = document.getElementById(fieldId);
+      if (field && value !== null && value !== undefined) {
+        field.value = value;
+      }
     }
 
     function initializePistas() {
@@ -2262,11 +2392,11 @@
       if (track.setup_recommendations?.recommended_setups && Object.keys(track.setup_recommendations.recommended_setups).length > 0) {
         html += `
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
-            <button type="button" class="action-button" onclick="openTrackConditionModal('${track.id}')">
+            <button type="button" class="action-button" onclick="openSetupWizard('${track.id}')">
               🔧 Carregar Setup Recomendado
             </button>
             <small style="display: block; color: var(--text-softer); text-align: center; margin-top: 8px;">
-              Clique para selecionar a condição de pista
+              Selecione a condição e o modelo do kart
             </small>
           </div>
         `;
