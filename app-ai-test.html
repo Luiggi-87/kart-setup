@@ -614,7 +614,230 @@
       color: var(--warning);
     }
 
+    /* Pistas Tab Styles */
+    .pistas-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .pistas-filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 8px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+    }
+
+    .pistas-content {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 20px;
+      min-height: 600px;
+    }
+
+    .pistas-list-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      overflow-y: auto;
+      max-height: 700px;
+    }
+
+    .pistas-list-container h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .pistas-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pista-item {
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .pista-item:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    .pista-item.active {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    }
+
+    .pista-item-name {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .pista-item-location {
+      font-size: 11px;
+      color: var(--text-softer);
+    }
+
+    .pista-detail-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      overflow-y: auto;
+      max-height: 700px;
+    }
+
+    .pista-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .pista-detail-header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .pista-detail-header h2 {
+      color: var(--accent);
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .pista-detail-header .location {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .detail-section {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    .detail-section h4 {
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .info-label {
+      color: var(--text-softer);
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: var(--text);
+    }
+
+    .tracados-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tracado-item {
+      padding: 8px;
+      background: rgba(0, 255, 136, 0.05);
+      border-left: 2px solid var(--accent);
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .tracado-name {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tracado-details {
+      color: var(--text-softer);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
     /* Responsive */
+    @media (max-width: 1200px) {
+      .pistas-content {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .pistas-list-container,
+      .pista-detail-container {
+        max-height: none;
+      }
+    }
+
     @media (max-width: 768px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -636,6 +859,14 @@
 
       .header-actions .btn {
         flex: 1;
+      }
+
+      .pistas-filters {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-info {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -659,6 +890,7 @@
     <div class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('inputs')">📝 Inputs</button>
       <button class="tab-btn" onclick="switchTab('analysis')">🔍 Análise</button>
+      <button class="tab-btn" onclick="switchTab('pistas')">🏁 Pistas</button>
       <button class="tab-btn" onclick="switchTab('history')">📚 Histórico</button>
     </div>
 
@@ -1125,6 +1357,80 @@
       </div>
     </div>
 
+    <!-- Tab: Pistas -->
+    <div id="pistas" class="tab-content">
+      <div class="pistas-container">
+        <!-- Filtros -->
+        <div class="pistas-filters">
+          <div class="filter-group">
+            <label for="filtro-regiao">🗺️ Região</label>
+            <select id="filtro-regiao" onchange="updateTracksList()">
+              <option value="">-- Todas as Regiões --</option>
+              <option value="sudeste">Sudeste</option>
+              <option value="sul">Sul</option>
+              <option value="centro_oeste">Centro-Oeste</option>
+              <option value="nordeste">Nordeste</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filtro-estado">📍 Estado</label>
+            <select id="filtro-estado" onchange="updateTracksList()">
+              <option value="">-- Todos os Estados --</option>
+              <option value="SP">São Paulo</option>
+              <option value="MG">Minas Gerais</option>
+              <option value="RJ">Rio de Janeiro</option>
+              <option value="RS">Rio Grande do Sul</option>
+              <option value="SC">Santa Catarina</option>
+              <option value="PR">Paraná</option>
+              <option value="DF">Distrito Federal</option>
+              <option value="PE">Pernambuco</option>
+              <option value="BA">Bahia</option>
+              <option value="PB">Paraíba</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filtro-dificuldade">⚡ Dificuldade</label>
+            <select id="filtro-dificuldade" onchange="updateTracksList()">
+              <option value="">-- Todas --</option>
+              <option value="Muito Alta">Muito Alta</option>
+              <option value="Alta">Alta</option>
+              <option value="Média-alta">Média-alta</option>
+              <option value="Técnica média-alta">Técnica Média-Alta</option>
+              <option value="Média">Média</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filtro-busca">🔍 Buscar</label>
+            <input type="text" id="filtro-busca" placeholder="Nome da pista..." onkeyup="updateTracksList()">
+          </div>
+        </div>
+
+        <!-- Divisão: Lista e Detalhes -->
+        <div class="pistas-content">
+          <!-- Lista de Pistas -->
+          <div class="pistas-list-container">
+            <h3>📋 Pistas Encontradas</h3>
+            <div id="pistasList" class="pistas-list">
+              <!-- Será preenchido por JavaScript -->
+            </div>
+          </div>
+
+          <!-- Detalhes da Pista -->
+          <div class="pistas-detail-container">
+            <div id="pistaDetail" class="pista-detail">
+              <div class="empty-state">
+                <div class="empty-state-icon">🏁</div>
+                <p>Selecione uma pista na lista para ver os detalhes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab: History -->
     <div id="history" class="tab-content">
       <div id="historyContent">
@@ -1137,6 +1443,7 @@
   </div>
 
   <script src="/js/kart-chassis-database.js" defer></script>
+  <script src="/js/kart-tracks-database.js" defer></script>
 
   <script>
     const STORAGE_KEY = 'kartAI_analyses_v1';
@@ -1176,9 +1483,14 @@
       // Mark button as active
       event.target.classList.add('active');
 
-      // Refresh history if switching to history tab
+      // Tab-specific actions
       if (tabName === 'history') {
         loadHistory();
+      } else if (tabName === 'pistas') {
+        // Initialize pistas if not already done
+        if (allTracks.length === 0) {
+          initializePistas();
+        }
       }
     }
 
@@ -1512,9 +1824,236 @@
       });
     }
 
+    // Pistas Tab Functions
+    let allTracks = [];
+    let selectedTrack = null;
+
+    function initializePistas() {
+      if (typeof KART_TRACKS_DATABASE === 'undefined') {
+        console.warn('⚠️ Track database not loaded yet');
+        showMessage('Base de dados de pistas carregando...', 'info');
+        return;
+      }
+
+      // Collect all tracks
+      allTracks = [];
+      for (const region of Object.values(KART_TRACKS_DATABASE)) {
+        if (region.tracks) {
+          for (const track of Object.values(region.tracks)) {
+            if (track.id && track.name) {
+              allTracks.push(track);
+            }
+          }
+        }
+      }
+
+      console.log(`✅ Loaded ${allTracks.length} tracks from database`);
+      updateTracksList();
+    }
+
+    function updateTracksList() {
+      // Get filter values
+      const regionFilter = document.getElementById('filtro-regiao')?.value || '';
+      const stateFilter = document.getElementById('filtro-estado')?.value || '';
+      const difficultyFilter = document.getElementById('filtro-dificuldade')?.value || '';
+      const searchFilter = document.getElementById('filtro-busca')?.value.toLowerCase() || '';
+
+      // Filter tracks
+      const filtered = allTracks.filter(track => {
+        // Region filter
+        if (regionFilter) {
+          let trackRegion = '';
+          for (const [regKey, region] of Object.entries(KART_TRACKS_DATABASE)) {
+            if (region.tracks && Object.values(region.tracks).includes(track)) {
+              trackRegion = regKey;
+              break;
+            }
+          }
+          if (trackRegion !== regionFilter) return false;
+        }
+
+        // State filter
+        if (stateFilter && track.state !== stateFilter) return false;
+
+        // Difficulty filter
+        if (difficultyFilter && track.characteristics?.difficulty !== difficultyFilter) return false;
+
+        // Search filter
+        if (searchFilter) {
+          const searchMatch =
+            track.name.toLowerCase().includes(searchFilter) ||
+            track.city?.toLowerCase().includes(searchFilter) ||
+            track.state?.toLowerCase().includes(searchFilter);
+          if (!searchMatch) return false;
+        }
+
+        return true;
+      });
+
+      // Render list
+      const listContainer = document.getElementById('pistasList');
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="no-results">
+            📭 Nenhuma pista encontrada com esses filtros
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(track => {
+        const isActive = selectedTrack && selectedTrack.id === track.id ? 'active' : '';
+        html += `
+          <div class="pista-item ${isActive}" onclick="displayTrackDetail('${track.id}')">
+            <div class="pista-item-name">${track.name}</div>
+            <div class="pista-item-location">📍 ${track.city}, ${track.state}</div>
+          </div>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+    }
+
+    function displayTrackDetail(trackId) {
+      // Find track
+      const track = allTracks.find(t => t.id === trackId);
+      if (!track) {
+        showMessage('⚠️ Pista não encontrada', 'warning');
+        return;
+      }
+
+      selectedTrack = track;
+
+      // Update active state in list
+      document.querySelectorAll('.pista-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+
+      // Render detail
+      const detailContainer = document.getElementById('pistaDetail');
+      const infrastructure = track.infrastructure || {};
+      const characteristics = track.characteristics || {};
+      const tracados = track.tracados || [];
+
+      let html = `
+        <div class="pista-detail">
+          <div class="pista-detail-header">
+            <h2>🏁 ${track.name}</h2>
+            <div class="location">
+              📍 ${track.city}, ${track.state}
+              ${track.coordinates ? ` • ${track.coordinates}` : ''}
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>⚙️ Infraestrutura</h4>
+            <div class="detail-info">
+              <div class="info-item">
+                <span class="info-label">Comprimento</span>
+                <span class="info-value">${infrastructure.length_m || 'N/A'} m</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Largura</span>
+                <span class="info-value">${infrastructure.width_m || 'N/A'} m</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Homologação</span>
+                <span class="info-value">${infrastructure.homologation || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Fundada</span>
+                <span class="info-value">${track.founded || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>🏎️ Características</h4>
+            <div class="detail-info">
+              <div class="info-item">
+                <span class="info-label">Tipo de Asfalto</span>
+                <span class="info-value">${characteristics.surface_type || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Dificuldade</span>
+                <span class="info-value">${characteristics.difficulty || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Clima</span>
+                <span class="info-value">${characteristics.climate || 'N/A'}</span>
+              </div>
+            </div>
+      `;
+
+      if (characteristics.main_features && characteristics.main_features.length > 0) {
+        html += `
+          <div style="margin-top: 8px;">
+            <div class="info-label">Características Principais</div>
+            <ul style="margin-top: 4px; margin-left: 16px; color: var(--text); font-size: 12px;">
+              ${characteristics.main_features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+
+      if (tracados.length > 0) {
+        html += `
+          <div class="detail-section">
+            <h4>🛣️ Traçados Disponíveis</h4>
+            <div class="tracados-list">
+              ${tracados.map(t => `
+                <div class="tracado-item">
+                  <div class="tracado-name">${t.name || t.id}</div>
+                  <div class="tracado-details">
+                    ${t.length_m ? `${t.length_m}m` : ''}
+                    ${t.characteristics && t.characteristics.length > 0 ? ` • ${t.characteristics.join(', ')}` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      const setupRecs = track.setup_recommendations;
+      if (setupRecs) {
+        html += `
+          <div class="detail-section">
+            <h4>🔧 Setup Recomendado</h4>
+            <div class="detail-info">
+              <div class="info-item">
+                <span class="info-label">Tipo de Terreno</span>
+                <span class="info-value">${setupRecs.terrain_type || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+
+      detailContainer.innerHTML = html;
+    }
+
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       loadSampleSetup();
+      // Initialize pistas when database is ready
+      if (typeof KART_TRACKS_DATABASE !== 'undefined') {
+        initializePistas();
+      } else {
+        // Try again after a short delay if database hasn't loaded yet
+        setTimeout(() => {
+          if (typeof KART_TRACKS_DATABASE !== 'undefined') {
+            initializePistas();
+          }
+        }, 500);
+      }
     });
   </script>
 </body>
