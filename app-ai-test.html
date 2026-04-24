@@ -2811,7 +2811,7 @@
 
     // Alternar painel de notificações
     function toggleNotificacoes(event) {
-      event.stopPropagation();
+      if (event) event.stopPropagation();
       const panel = document.getElementById('notificacoesPanel');
       panel.classList.toggle('active');
       if (panel.classList.contains('active')) {
