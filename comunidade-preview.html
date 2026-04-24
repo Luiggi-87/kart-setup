@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comunidade - Preview Notícias CBA</title>
+
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --bg-soft: #0f1535;
+      --bg-card: #050812;
+      --accent: #00ff88;
+      --text: #e5e7eb;
+      --text-soft: #a0aec0;
+      --text-softer: #6b7280;
+      --border: #1a2847;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #0f1535 50%, #050812 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .info-banner {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.1);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+    }
+
+    .info-banner small {
+      color: var(--text-soft);
+    }
+
+    .setup-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .setup-card:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .setup-card.inscricao {
+      border-left: 4px solid #ff6b6b;
+    }
+
+    .setup-card-title {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .setup-card-meta {
+      font-size: 12px;
+      color: var(--text-softer);
+      margin-bottom: 8px;
+    }
+
+    .setup-card-desc {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .card-footer {
+      font-size: 12px;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-right: 6px;
+    }
+
+    .badge-categoria {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--accent);
+    }
+
+    .badge-status {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+
+    .icon {
+      font-size: 20px;
+      margin-right: 8px;
+    }
+
+    .header-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-note {
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 20px;
+      color: #ffd700;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>👥 Comunidade</h1>
+        <p>Preview: Aba "Notícias CBA"</p>
+      </div>
+    </div>
+
+    <div class="demo-note">
+      ⚠️ <strong>Demo:</strong> Este é um preview de como o feed de Notícias CBA ficará quando totalmente implementado. As notícias serão sincronizadas toda segunda-feira às 9:00.
+    </div>
+
+    <div class="info-banner">
+      <small>📰 Notícias e atualizações da <strong>CBA - Confederação Brasileira de Automobilismo</strong></small><br>
+      <small style="color: var(--text-softer); display: block; margin-top: 4px;">⏰ Última atualização: segunda-feira às 9:00</small>
+    </div>
+
+    <!-- INSCRIÇÕES ABERTAS -->
+    <div class="section-title">🔴 INSCRIÇÕES ABERTAS</div>
+
+    <div class="setup-card inscricao">
+      <div class="header-line">
+        <span class="icon">📝</span>
+        <span class="badge badge-status">Aberto</span>
+        <span class="badge badge-categoria">Inscrições</span>
+      </div>
+      <div class="setup-card-title">⚡ Inscrições Abertas: 27ª Copa Brasil de Kart 2026</div>
+      <div class="setup-card-meta">📅 23 de abril de 2026 | Encerramento: 22 de maio de 2026</div>
+      <div class="setup-card-meta">📍 Kartódromo Internacional de Imperatriz (MA)</div>
+      <div class="setup-card-desc">Inscrições abertas para a 27ª Copa Brasil de Kart até 22 de maio. Categorias divididas em Grupos 1 e 2. Participação de pilotos de todas as regiões do Brasil.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <div class="setup-card inscricao">
+      <div class="header-line">
+        <span class="icon">📝</span>
+        <span class="badge badge-status">Aberto</span>
+        <span class="badge badge-categoria">Inscrições</span>
+      </div>
+      <div class="setup-card-title">⚡ Inscrições Abertas: Sul-Americano de Karting 2026</div>
+      <div class="setup-card-meta">📅 15 de abril de 2026 | Encerramento: 21 de maio de 2026</div>
+      <div class="setup-card-meta">📍 Circuito Internacional Techspeed, Nova Santa Rita (RS)</div>
+      <div class="setup-card-desc">Inscrições abertas para o Sul-Americano de Karting 2026. Categorias: Pilotos nacionais e estrangeiros. Evento de grande importância internacional.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <!-- PRÓXIMOS EVENTOS -->
+    <div class="section-title">🌎 PRÓXIMOS EVENTOS</div>
+
+    <div class="setup-card">
+      <div class="header-line">
+        <span class="icon">🌎</span>
+        <span class="badge badge-categoria">Internacional</span>
+      </div>
+      <div class="setup-card-title">2º Campeonato Sul-Americano de Kart 4 Tempos</div>
+      <div class="setup-card-meta">📅 21-24 de maio de 2026</div>
+      <div class="setup-card-meta">📍 Circuito Internacional Techspeed, Nova Santa Rita (RS)</div>
+      <div class="setup-card-desc">Reunirá pilotos da Argentina, Brasil, Peru e Uruguai em uma das pistas mais modernas da região. Com apoio da FIA.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="header-line">
+        <span class="icon">🏆</span>
+        <span class="badge badge-categoria">Nacional</span>
+      </div>
+      <div class="setup-card-title">27ª Copa Brasil de Kart</div>
+      <div class="setup-card-meta">📅 22 de julho - 1º de agosto de 2026</div>
+      <div class="setup-card-meta">📍 Kartódromo Internacional de Imperatriz (MA)</div>
+      <div class="setup-card-desc">Um dos principais campeonatos nacionais com participação de pilotos de todas as regiões do Brasil.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <!-- NOTÍCIAS GERAIS -->
+    <div class="section-title">📰 NOTÍCIAS GERAIS</div>
+
+    <div class="setup-card">
+      <div class="header-line">
+        <span class="icon">🏆</span>
+        <span class="badge badge-categoria">Brasileiro</span>
+      </div>
+      <div class="setup-card-title">Speed Park se prepara para receber o Brasileiro de Kart pela terceira vez</div>
+      <div class="setup-card-meta">📅 17 de abril de 2026</div>
+      <div class="setup-card-desc">O kartódromo Speed Park, localizado em Birigui (SP), será pela terceira vez sede da principal competição nacional. Um dos kartódromos mais modernos e seguros do país, já está em preparativos para a 61ª edição marcada para novembro.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="header-line">
+        <span class="icon">🏅</span>
+        <span class="badge badge-categoria">Campeões</span>
+      </div>
+      <div class="setup-card-title">Marcos Adriano é confirmado campeão da 60ª edição na F4 Grand Super Sênior</div>
+      <div class="setup-card-meta">📅 23 de março de 2026</div>
+      <div class="setup-card-desc">Após julgamentos no STJD, o piloto carioca Marcos Adriano da Silva conquistou o título na categoria F4 Grand Super Sênior, representando seu bicampeonato na competição.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="header-line">
+        <span class="icon">📐</span>
+        <span class="badge badge-categoria">Técnica</span>
+      </div>
+      <div class="setup-card-title">CBA anuncia traçado do Speed Park para a 61ª edição</div>
+      <div class="setup-card-meta">📅 20 de janeiro de 2026</div>
+      <div class="setup-card-desc">A CBA divulgou que o traçado utilizado terá 1.214m, no sentido anti-horário. O evento está programado para acontecer entre 16 e 28 de novembro em Birigui.</div>
+      <div class="card-footer">🔗 Acessar no CBA.ORG.BR →</div>
+    </div>
+
+  </div>
+</body>
+</html>

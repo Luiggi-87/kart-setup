@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Calendário — Kart Setup</title>
+
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --bg-soft: #0f1535;
+      --bg-card: #050812;
+      --accent: #00ff88;
+      --text: #e5e7eb;
+      --text-soft: #a0aec0;
+      --text-softer: #6b7280;
+      --border: #1a2847;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #0f1535 50%, #050812 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Main Navigation */
+    .main-nav {
+      background: rgba(5, 8, 18, 0.4);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+      padding: 12px 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .calendario-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .calendario-filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .calendario-filters input {
+      padding: 8px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      flex: 1;
+    }
+
+    .eventos-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .evento-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .evento-card:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .evento-card.destaque {
+      border: 2px solid var(--accent);
+      background: rgba(0, 255, 136, 0.08);
+    }
+
+    .evento-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .evento-titulo {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .evento-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(0, 255, 136, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .evento-info {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .evento-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .evento-desc {
+      font-size: 12px;
+      color: var(--text-softer);
+      line-height: 1.4;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-soft);
+      grid-column: 1/-1;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .eventos-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script src="utils-security.js"></script>
+
+  <!-- Main Navigation -->
+  <div class="main-nav">
+    <div class="container" style="display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+      <a href="app-ai-test.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">🤖 Análise</a>
+      <a href="calendario.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">📅 Calendário</a>
+      <a href="comunidade.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">👥 Comunidade</a>
+      <a href="perfil.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">👤 Perfil</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>📅 Calendário</h1>
+        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Acompanhe os principais campeonatos e eventos de kartismo no Brasil</p>
+      </div>
+    </div>
+
+    <div class="calendario-container">
+      <!-- Filtros -->
+      <div class="calendario-filters" style="margin-bottom: 20px;">
+        <input type="text" id="filtro-evento" placeholder="🔍 Buscar evento..." onkeyup="filterEventos()" style="padding: 8px 12px;">
+      </div>
+
+      <!-- Lista de Eventos -->
+      <div id="eventosList" class="eventos-list">
+        <!-- Será preenchido por JavaScript -->
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    // Calendário de Eventos CBK 2026 (em ordem cronológica)
+    const EVENTOS_CBK_2026 = [
+      {
+        id: 'birigui-fev',
+        titulo: 'Etapa Birigui - Fevereiro',
+        data: '28 de fevereiro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Primeira etapa da temporada no circuito de Birigui. Ótima oportunidade para treino e preparação.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'birigui-abr',
+        titulo: 'Etapa Birigui - Abril',
+        data: '25 de abril de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Segunda etapa da temporada em Birigui. Acompanhe a evolução dos pilotos.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'sulamericano',
+        titulo: '2º Campeonato Sul-Americano de Kart 4 Tempos',
+        data: '21-24 de maio de 2026',
+        local: 'Circuito International Techspeed, Nova Santa Rita (RS)',
+        categoria: 'Internacional',
+        icon: '🌎',
+        destaque: true,
+        descricao: 'Com apoio da FIA. Reunirá pilotos de toda América do Sul em uma das pistas mais modernas da região.',
+        link: 'https://www.cba.org.br/campeonato/home/168/'
+      },
+      {
+        id: 'birigui-jun',
+        titulo: 'Etapa Birigui - Junho',
+        data: '20 de junho de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Terceira etapa. Competição acirrada entre os principais pilotos.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'copa-brasil',
+        titulo: '27ª Copa Brasil de Kart',
+        data: '22 de julho - 1º de agosto de 2026',
+        local: 'Kartódromo Internacional de Imperatriz (MA)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Um dos principais campeonatos nacionais com participação de pilotos de todas as regiões do Brasil.',
+        link: 'https://www.cba.org.br/campeonato/home/245/'
+      },
+      {
+        id: 'birigui-jul',
+        titulo: 'Etapa Birigui - Julho',
+        data: '25 de julho de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Quarta etapa da temporada.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'birigui-set',
+        titulo: 'Etapa Birigui - Setembro',
+        data: '26 de setembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Quinta etapa da temporada.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'birigui-out',
+        titulo: 'Etapa Birigui - Outubro',
+        data: '24 de outubro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Open do Brasileiro - Última etapa e oportunidade para se classificar para o nacional.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'brasileiro-g1',
+        titulo: '61º Brasileiro de Kart - Grupo 1',
+        data: '16-21 de novembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Grupo 1 do maior campeonato de kart do Brasil. Grande movimentação esperada.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      },
+      {
+        id: 'brasileiro-g2',
+        titulo: '61º Brasileiro de Kart - Grupo 2',
+        data: '23-28 de novembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Grupo 2 do Brasileiro. Finalizando a temporada em grande estilo.',
+        link: 'https://www.cba.org.br/campeonato/home/82/'
+      }
+    ];
+
+    function renderEventos(eventos) {
+      const listContainer = document.getElementById('eventosList');
+
+      if (eventos.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum evento encontrado</p></div>';
+        return;
+      }
+
+      listContainer.innerHTML = ''; // 🔒 Limpar de forma segura
+
+      eventos.forEach(evento => {
+        if (!evento || typeof evento !== 'object') return;
+
+        const destaqueClass = evento.destaque ? 'destaque' : '';
+        const hasLink = evento.link && evento.link !== '#';
+
+        // 🔒 Criar elemento de forma SEGURA (não usar innerHTML)
+        const card = document.createElement('div');
+        card.className = `evento-card ${destaqueClass}`;
+        card.style.cursor = hasLink ? 'pointer' : 'default';
+
+        const header = document.createElement('div');
+        header.className = 'evento-header';
+
+        const titulo = document.createElement('div');
+        titulo.className = 'evento-titulo';
+        titulo.textContent = `${evento.icon || '🏁'} ${evento.titulo || ''}`;
+        header.appendChild(titulo);
+
+        const badge = document.createElement('span');
+        badge.className = 'evento-badge';
+        badge.textContent = evento.categoria || '';
+        header.appendChild(badge);
+
+        card.appendChild(header);
+
+        const info = document.createElement('div');
+        info.className = 'evento-info';
+
+        const data = document.createElement('div');
+        data.className = 'evento-info-item';
+        data.textContent = `📅 ${evento.data || ''}`;
+        info.appendChild(data);
+
+        const local = document.createElement('div');
+        local.className = 'evento-info-item';
+        local.textContent = `📍 ${evento.local || ''}`;
+        info.appendChild(local);
+
+        card.appendChild(info);
+
+        const desc = document.createElement('div');
+        desc.className = 'evento-desc';
+        desc.textContent = evento.descricao || '';
+        card.appendChild(desc);
+
+        // 🔒 Adicionar link de forma SEGURA
+        if (hasLink) {
+          const linkBtn = document.createElement('a');
+          linkBtn.style.cssText = 'display: inline-block; margin-top: 12px; padding: 8px 12px; background: rgba(0, 255, 136, 0.2); border: 1px solid var(--accent); border-radius: 6px; color: var(--accent); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;';
+          linkBtn.textContent = '🔗 Ver mais no CBK';
+          linkBtn.onclick = (e) => {
+            e.preventDefault();
+            openSafeLink(evento.link);
+          };
+          card.appendChild(linkBtn);
+        }
+
+        // 🔒 Adicionar click handler seguro
+        if (hasLink) {
+          card.onclick = () => openSafeLink(evento.link);
+        }
+
+        listContainer.appendChild(card);
+      });
+    }
+
+    function filterEventos() {
+      const searchTerm = document.getElementById('filtro-evento').value.toLowerCase();
+      const filtered = EVENTOS_CBK_2026.filter(e =>
+        e.titulo.toLowerCase().includes(searchTerm) ||
+        e.local.toLowerCase().includes(searchTerm) ||
+        e.categoria.toLowerCase().includes(searchTerm)
+      );
+      renderEventos(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderEventos(EVENTOS_CBK_2026);
+    });
+  </script>
+</body>
+</html>

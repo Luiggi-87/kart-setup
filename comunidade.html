@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Comunidade — Kart Setup</title>
+
+  <style>
+    :root {
+      --bg: #0a0e27;
+      --bg-soft: #0f1535;
+      --bg-card: #050812;
+      --accent: #00ff88;
+      --text: #e5e7eb;
+      --text-soft: #a0aec0;
+      --text-softer: #6b7280;
+      --border: #1a2847;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #0f1535 50%, #050812 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Main Navigation */
+    .main-nav {
+      background: rgba(5, 8, 18, 0.4);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+      padding: 12px 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      padding: 0 0 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-soft);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .setup-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .setup-card:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+    }
+
+    .setup-card-title {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .setup-card-meta {
+      font-size: 11px;
+      color: var(--text-softer);
+      margin-bottom: 8px;
+    }
+
+    .setup-card-desc {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .perfil-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .perfil-avatar {
+      font-size: 48px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 2px solid var(--accent);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .perfil-info h2 {
+      color: var(--accent);
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .perfil-info p {
+      color: var(--text-soft);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .perfil-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .badges-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .badge-item {
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .badge-item.locked {
+      opacity: 0.5;
+      background: rgba(100, 100, 100, 0.1);
+      border-color: var(--text-softer);
+    }
+
+    .badge-icon {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .badge-name {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .ranking-position {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .ranking-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .ranking-info h4 {
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .ranking-info small {
+      color: var(--text-softer);
+      font-size: 11px;
+    }
+
+    .ranking-score {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-soft);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    h3 {
+      color: var(--accent);
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="utils-security.js"></script>
+
+  <!-- Main Navigation -->
+  <div class="main-nav">
+    <div class="container" style="display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+      <a href="app-ai-test.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">🤖 Análise</a>
+      <a href="calendario.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">📅 Calendário</a>
+      <a href="comunidade.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">👥 Comunidade</a>
+      <a href="perfil.html" class="btn btn-secondary" style="text-decoration: none; padding: 8px 14px; font-size: 12px;">👤 Perfil</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>👥 Comunidade</h1>
+        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Compartilhe setups, dicas e conecte-se com outros pilotos</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-primary" onclick="openCreatePostModal()">📝 Novo Post</button>
+      </div>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('feed')">🏁 Feed</button>
+      <button class="tab-btn" onclick="switchTab('noticias')">📰 Notícias CBA</button>
+      <button class="tab-btn" onclick="switchTab('dicas')">💡 Dicas</button>
+      <button class="tab-btn" onclick="switchTab('rankings')">🏆 Rankings</button>
+      <button class="tab-btn" onclick="switchTab('perfil')">👤 Meu Perfil</button>
+    </div>
+
+    <div id="feed" class="tab-content active">
+      <div id="feedContent"></div>
+    </div>
+
+    <div id="noticias" class="tab-content">
+      <div id="noticiasContent"></div>
+    </div>
+
+    <div id="dicas" class="tab-content">
+      <div id="dicasContent"></div>
+    </div>
+
+    <div id="rankings" class="tab-content">
+      <div id="rankingsContent"></div>
+    </div>
+
+    <div id="perfil" class="tab-content">
+      <div id="perfilContent"></div>
+    </div>
+  </div>
+  </div>
+
+  <div id="createPostModal" class="modal">
+    <div class="modal-content">
+      <h2 style="color: var(--accent); margin-bottom: 16px;">📝 Criar Novo Post</h2>
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" id="postTitulo" placeholder="Ex: Setup Balanceado para Nova Odessa">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="postTipo">
+          <option value="setup">🏁 Setup</option>
+          <option value="dica">💡 Dica & Truque</option>
+          <option value="discussao">💬 Discussão</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pista (opcional)</label>
+        <input type="text" id="postPista" placeholder="Ex: Nova Odessa">
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="postDescricao" placeholder="Descreva seu setup ou dica..."></textarea>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="createPost()" class="btn btn-primary" style="flex: 1;">📤 Publicar</button>
+        <button onclick="closeCreatePostModal()" class="btn btn-secondary" style="flex: 1;">✕ Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let userData = {
+      nome: 'Piloto Anônimo',
+      email: 'sem-email@exemplo.com',
+      setupsCriados: 0,
+      analisesFeitass: 0,
+      pontos: 0,
+      posts: [],
+      badgesDesbloqueadas: []
+    };
+
+    const BADGES = [
+      { id: 'primeira', icon: '🚀', nome: 'Primeiro Setup', condicao: () => userData.setupsCriados >= 1 },
+      { id: 'master', icon: '🏆', nome: 'Setup Master', condicao: () => userData.setupsCriados >= 5 },
+      { id: 'analista', icon: '🔍', nome: 'Analista', condicao: () => userData.analisesFeitass >= 10 },
+      { id: 'lover', icon: '💛', nome: 'Community Lover', condicao: () => userData.pontos >= 50 },
+    ];
+
+    const RANKINGS = [
+      { posicao: 1, nome: 'Piloto Campeão', pista: 'Nova Odessa', pontos: 2850 },
+      { posicao: 2, nome: 'Racer Elite', pista: 'KGV', pontos: 2720 },
+      { posicao: 3, nome: 'Técnico Setup', pista: 'Uberlândia', pontos: 2640 },
+      { posicao: 4, nome: 'Rain Master', pista: 'Velopark', pontos: 2510 },
+      { posicao: 5, nome: 'Nordeste Kart', pista: 'Recife', pontos: 2390 },
+    ];
+
+    function loadUserData() {
+      const saved = localStorage.getItem('userDataKartSetup');
+      if (saved) userData = JSON.parse(saved);
+    }
+
+    function saveUserData() {
+      localStorage.setItem('userDataKartSetup', JSON.stringify(userData));
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      if (tabName === 'feed') renderFeed();
+      else if (tabName === 'noticias') renderNoticias();
+      else if (tabName === 'dicas') renderDicas();
+      else if (tabName === 'rankings') renderRankings();
+      else if (tabName === 'perfil') renderPerfil();
+    }
+
+    function openCreatePostModal() {
+      document.getElementById('createPostModal').classList.add('active');
+    }
+
+    function closeCreatePostModal() {
+      document.getElementById('createPostModal').classList.remove('active');
+      document.getElementById('postTitulo').value = '';
+      document.getElementById('postDescricao').value = '';
+      document.getElementById('postPista').value = '';
+    }
+
+    function createPost() {
+      const titulo = document.getElementById('postTitulo').value.trim();
+      const tipo = document.getElementById('postTipo').value;
+      const pista = document.getElementById('postPista').value.trim();
+      const descricao = document.getElementById('postDescricao').value.trim();
+
+      if (!titulo || !descricao) {
+        alert('⚠️ Por favor, preencha título e descrição');
+        return;
+      }
+
+      userData.posts.unshift({
+        id: Date.now(),
+        titulo, tipo, pista, descricao,
+        autor: userData.nome,
+        data: new Date().toLocaleDateString('pt-BR'),
+        upvotes: 0
+      });
+
+      userData.setupsCriados++;
+      userData.pontos += (tipo === 'setup' ? 10 : 5);
+      saveUserData();
+      closeCreatePostModal();
+      alert('✅ Post publicado!');
+      renderFeed();
+    }
+
+    function renderFeed() {
+      const container = document.getElementById('feedContent');
+      if (userData.posts.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>Nenhum post. <a href="#" onclick="openCreatePostModal(); return false;" style="color: var(--accent);">Crie um!</a></p></div>';
+        return;
+      }
+      let html = '';
+      userData.posts.forEach(post => {
+        html += `<div class="setup-card"><div class="setup-card-title">${post.titulo}</div><div class="setup-card-meta">${post.pista ? `📍 ${post.pista} • ` : ''}${post.data} por ${post.autor}</div><div class="setup-card-desc">${post.descricao}</div><div style="font-size: 11px; color: var(--text-softer);">👍 ${post.upvotes} curtidas</div></div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderDicas() {
+      const container = document.getElementById('dicasContent');
+      const dicas = userData.posts.filter(p => p.tipo === 'dica');
+      if (dicas.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💡</div><p>Nenhuma dica publicada</p></div>';
+        return;
+      }
+      let html = '';
+      dicas.forEach(d => {
+        html += `<div class="setup-card"><div class="setup-card-title">💡 ${d.titulo}</div><div class="setup-card-desc">${d.descricao}</div></div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderRankings() {
+      const container = document.getElementById('rankingsContent');
+      let html = '';
+      RANKINGS.forEach(r => {
+        html += `<div class="ranking-item"><div class="ranking-position"><div class="ranking-number">${r.posicao}</div><div class="ranking-info"><h4>${r.nome}</h4><small>📍 ${r.pista}</small></div></div><div class="ranking-score">${r.pontos}</div></div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderPerfil() {
+      const container = document.getElementById('perfilContent');
+      let badges = '';
+      BADGES.forEach(b => {
+        const desbloqueado = b.condicao();
+        badges += `<div class="badge-item ${desbloqueado ? '' : 'locked'}"><div class="badge-icon">${b.icon}</div><div class="badge-name">${b.nome}</div></div>`;
+      });
+
+      container.innerHTML = `
+        <div class="perfil-header">
+          <div class="perfil-avatar">👤</div>
+          <div class="perfil-info">
+            <h2>${userData.nome}</h2>
+            <p>${userData.email}</p>
+          </div>
+          <button class="btn btn-secondary" onclick="editarNome()" style="position: absolute; top: 20px; right: 20px;">✏️ Editar</button>
+        </div>
+        <div class="perfil-stats">
+          <div class="stat-card"><div class="stat-number">${userData.setupsCriados}</div><div class="stat-label">Setups</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.pontos}</div><div class="stat-label">Pontos</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.posts.length}</div><div class="stat-label">Posts</div></div>
+          <div class="stat-card"><div class="stat-number">${userData.badgesDesbloqueadas.length}</div><div class="stat-label">Badges</div></div>
+        </div>
+        <h3>🏅 Suas Conquistas</h3>
+        <div class="badges-list">${badges}</div>
+      `;
+    }
+
+    function editarNome() {
+      const nome = prompt('Seu nome:', userData.nome);
+      if (nome && nome.trim()) {
+        userData.nome = nome.trim();
+        saveUserData();
+        renderPerfil();
+      }
+    }
+
+    // Notícias CBA Integration
+    async function fetchKartNews() {
+      try {
+        const container = document.getElementById('noticiasContent');
+        container.innerHTML = '';
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'empty-state';
+        loadingDiv.innerHTML = '<div class="empty-state-icon">⏳</div><p>Carregando notícias da CBA...</p>';
+        container.appendChild(loadingDiv);
+
+        // 🔒 Fetch com timeout de 5 segundos
+        const response = await fetchWithTimeout('/.netlify/functions/fetch-kart-news', {}, 5000);
+
+        if (!response.ok) throw new Error('Erro ao buscar notícias');
+
+        const data = await response.json();
+
+        // 🔒 Validar resposta antes de armazenar
+        if (!Array.isArray(data.news)) {
+          throw new Error('Formato de resposta inválido');
+        }
+
+        // Salvar no localStorage com timestamp
+        const newsData = {
+          timestamp: Date.now(),
+          news: data.news || [],
+          stats: data.stats || {}
+        };
+
+        if (!saveUserDataSafely('kartNews_v1', newsData)) {
+          console.warn('⚠️ Falha ao salvar notícias no localStorage');
+        }
+
+        renderNoticias(data.news);
+      } catch (error) {
+        console.error('❌ Erro ao buscar notícias:', error);
+        loadNoticiasFromStorage();
+      }
+    }
+
+    function loadNoticiasFromStorage() {
+      try {
+        const stored = loadUserDataSafely('kartNews_v1', null);
+        if (stored && stored.news) {
+          renderNoticias(stored.news);
+        } else {
+          renderNoticiasEmpty();
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar notícias do localStorage:', error);
+        renderNoticiasEmpty();
+      }
+    }
+
+    function renderNoticias(noticias = null) {
+      const container = document.getElementById('noticiasContent');
+      container.innerHTML = ''; // Limpar de forma segura
+
+      let newsToRender = noticias;
+      if (!newsToRender) {
+        const stored = loadUserDataSafely('kartNews_v1', null);
+        if (stored && stored.news) {
+          newsToRender = stored.news;
+        }
+      }
+
+      if (!newsToRender || newsToRender.length === 0) {
+        renderNoticiasEmpty();
+        return;
+      }
+
+      // 🔒 Adicionar header de forma segura
+      const header = document.createElement('div');
+      header.style.cssText = 'margin-bottom: 16px; padding: 12px; background: rgba(0, 255, 136, 0.1); border-left: 4px solid var(--accent); border-radius: 6px;';
+      const headerText = document.createElement('small');
+      headerText.style.color = 'var(--text-soft)';
+      headerText.innerHTML = '📰 Notícias e atualizações da <strong>CBA - Confederação Brasileira de Automobilismo</strong>';
+      header.appendChild(headerText);
+
+      const headerSub = document.createElement('small');
+      headerSub.style.cssText = 'color: var(--text-softer); margin-top: 4px; display: block;';
+      headerSub.textContent = '⏰ Última atualização: segunda-feira às 9:00';
+      header.appendChild(headerSub);
+
+      container.appendChild(header);
+
+      // 🔒 Renderizar notícias de forma SEGURA (sem innerHTML)
+      newsToRender.forEach(noticia => {
+        if (!noticia || typeof noticia !== 'object') return;
+
+        const card = document.createElement('div');
+        card.className = 'setup-card';
+        card.style.cssText = 'cursor: pointer; transition: all 0.2s ease;';
+
+        const categoryColor = noticia.categoria === 'Inscrições' ? '#ff6b6b' : 'var(--accent)';
+        card.style.borderLeft = `4px solid ${categoryColor}`;
+
+        // Header com icons e badges (usando textContent, NÃO innerHTML)
+        const headerDiv = document.createElement('div');
+        headerDiv.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+
+        const icon = document.createElement('span');
+        icon.style.fontSize = '20px';
+        icon.textContent = noticia.icon || '📰';
+        headerDiv.appendChild(icon);
+
+        const badge = document.createElement('span');
+        badge.style.cssText = `color: ${categoryColor}; font-weight: 600; font-size: 11px; text-transform: uppercase; background: ${noticia.categoria === 'Inscrições' ? 'rgba(255, 107, 107, 0.2)' : 'rgba(0, 255, 136, 0.2)'}; padding: 2px 8px; border-radius: 3px;`;
+        badge.textContent = noticia.categoria || 'Notícia';
+        headerDiv.appendChild(badge);
+
+        if (noticia.status) {
+          const statusBadge = document.createElement('span');
+          statusBadge.style.cssText = 'color: #ff6b6b; font-weight: 600; font-size: 11px; text-transform: uppercase; background: rgba(255, 107, 107, 0.2); padding: 2px 8px; border-radius: 3px;';
+          statusBadge.textContent = noticia.status;
+          headerDiv.appendChild(statusBadge);
+        }
+
+        card.appendChild(headerDiv);
+
+        // Título
+        const titulo = document.createElement('div');
+        titulo.className = 'setup-card-title';
+        titulo.textContent = noticia.titulo || '';
+        card.appendChild(titulo);
+
+        // Meta (data + local)
+        const meta = document.createElement('div');
+        meta.className = 'setup-card-meta';
+        meta.textContent = `📅 ${noticia.dataFormatada || noticia.data}${noticia.local ? ` • 📍 ${noticia.local}` : ''}`;
+        card.appendChild(meta);
+
+        // Descrição
+        const desc = document.createElement('div');
+        desc.className = 'setup-card-desc';
+        desc.textContent = noticia.resumo || '';
+        card.appendChild(desc);
+
+        // Link (seguro)
+        const linkDiv = document.createElement('div');
+        linkDiv.style.cssText = 'margin-top: 8px; font-size: 12px; color: var(--accent); cursor: pointer;';
+        linkDiv.textContent = '🔗 Acessar no CBA.ORG.BR →';
+        linkDiv.onclick = () => openSafeLink(noticia.link);
+        card.appendChild(linkDiv);
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderNoticiasEmpty() {
+      const container = document.getElementById('noticiasContent');
+      container.innerHTML = '';
+
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'empty-state';
+
+      const icon = document.createElement('div');
+      icon.className = 'empty-state-icon';
+      icon.textContent = '📰';
+      emptyDiv.appendChild(icon);
+
+      const title = document.createElement('h3');
+      title.style.marginTop = '16px';
+      title.textContent = 'Notícias da CBA';
+      emptyDiv.appendChild(title);
+
+      const text = document.createElement('p');
+      text.style.marginBottom = '16px';
+      text.textContent = 'Carregando as últimas notícias, inscrições e atualizações da Confederação Brasileira de Automobilismo...';
+      emptyDiv.appendChild(text);
+
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary';
+      btn.style.marginTop = '12px';
+      btn.textContent = '🔄 Tentar novamente';
+      btn.onclick = fetchKartNews;
+      emptyDiv.appendChild(btn);
+
+      container.appendChild(emptyDiv);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserData();
+      renderFeed();
+
+      // Carregar notícias da CBA ao abrir a página
+      fetchKartNews();
+    });
+
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('createPostModal');
+      if (e.target === modal) closeCreatePostModal();
+    });
+  </script>
+</body>
+</html>

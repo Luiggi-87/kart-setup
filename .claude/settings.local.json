@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(dir \"C:\\\\Users\\\\Luiggi G. Loureiro\\\\OneDrive - Launch Digital\\\\Desktop\\\\Kart Republic\\\\App\\\\Original\")",
+      "Bash(app-ai-test)",
+      "Bash(landing\")",
+      "Bash(cd \"C:\\\\\\\\Users\\\\\\\\Luiggi G. Loureiro\\\\\\\\OneDrive - Launch Digital\\\\\\\\Desktop\\\\\\\\Kart Republic\\\\\\\\App\\\\\\\\Original\")",
+      "Bash(awk '{print $9, \"\\(\" $5 \"\\)\"}')",
+      "Bash(grep -l \"tab-nav\" \"C:\\\\\\\\Users\\\\\\\\Luiggi G. Loureiro\\\\\\\\OneDrive - Launch Digital\\\\\\\\Desktop\\\\\\\\Kart Republic\\\\\\\\App\\\\\\\\Original\\\\\"/*.html)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__switch_browser",
+      "WebFetch(domain:www.cba.org.br)",
+      "mcp__scheduled-tasks__create_scheduled_task",
+      "mcp__scheduled-tasks__update_scheduled_task",
+      "Bash(cat)",
+      "Read(//c/Users/Luiggi G. Loureiro/OneDrive - Launch Digital/Desktop/Kart Republic/**)"
+    ]
+  }
+}

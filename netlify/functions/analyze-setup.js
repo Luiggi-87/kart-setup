@@ -377,9 +377,15 @@ Respond ONLY with valid JSON.`;
   return { prompt1, prompt2 };
 }
 
-// Call Hugging Face API
+// Call Hugging Face API with 🔒 TIMEOUT PROTECTION
 async function callHuggingFaceAPI(prompt) {
+  const TIMEOUT_MS = 5000; // 5 segundos
+
   try {
+    // 🔒 Implementar timeout com AbortController
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
     const response = await fetch(HF_API_URL, {
       method: 'POST',
       headers: {
@@ -393,8 +399,11 @@ async function callHuggingFaceAPI(prompt) {
           temperature: 0.3,
           top_p: 0.9
         }
-      })
+      }),
+      signal: controller.signal // Permite abortar requisição
     });
+
+    clearTimeout(timeoutId); // Limpar timeout se resposta chegou rápido
 
     if (!response.ok) {
       throw new Error(`Hugging Face API error: ${response.status}`);
@@ -410,15 +419,24 @@ async function callHuggingFaceAPI(prompt) {
       text = result.generated_text;
     }
 
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    // 🔒 Melhor parsing de JSON (usar try-catch)
+    let jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in AI response');
     }
 
-    return JSON.parse(jsonMatch[0]);
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      throw new Error('Invalid JSON in AI response');
+    }
   } catch (error) {
-    console.error('Hugging Face API call failed:', error);
+    if (error.name === 'AbortError') {
+      console.error('❌ Hugging Face API timeout após ' + TIMEOUT_MS + 'ms');
+      throw new Error(`Hugging Face timeout (${TIMEOUT_MS}ms)`);
+    }
+    console.error('❌ Hugging Face API call failed:', error);
     throw error;
   }
 }

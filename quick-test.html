@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🔒 Teste Rápido - Kart Republic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: monospace;
+      background: #0a0e27;
+      color: #00ff88;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .box {
+      background: #050812;
+      border: 2px solid #00ff88;
+      border-radius: 6px;
+      padding: 20px;
+      margin: 10px 0;
+    }
+    h1 { color: #00ff88; margin-bottom: 10px; }
+    h2 { color: #ffaa00; margin-top: 20px; }
+    .pass { color: #00ff88; }
+    .fail { color: #ff4444; }
+    .info { color: #38bdf8; }
+    .status { font-size: 20px; margin: 20px 0; }
+    button {
+      background: #00ff88;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    button:hover { box-shadow: 0 0 15px rgba(0,255,136,0.5); }
+    .result { margin: 5px 0; }
+    pre { background: #1a2847; padding: 10px; border-radius: 4px; overflow-x: auto; }
+  </style>
+  <script src="utils-security.js"></script>
+</head>
+<body>
+  <div class="box">
+    <h1>🔒 TESTE RÁPIDO DE SEGURANÇA</h1>
+    <p>Clique no botão abaixo para executar os testes</p>
+    <button onclick="runTests()">▶️ EXECUTAR TESTES</button>
+  </div>
+
+  <div id="results" class="box" style="display: none;">
+    <h2>📊 RESULTADOS</h2>
+    <div id="testOutput"></div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    function runTests() {
+      const resultsDiv = document.getElementById('results');
+      const outputDiv = document.getElementById('testOutput');
+      const statusDiv = document.getElementById('status');
+
+      resultsDiv.style.display = 'block';
+      outputDiv.innerHTML = '';
+
+      const tests = [
+        {
+          name: '1. utils-security.js',
+          test: () => typeof escapeHtml === 'function' && typeof openSafeLink === 'function'
+        },
+        {
+          name: '2. escapeHtml() - XSS Prevention',
+          test: () => {
+            const result = escapeHtml('<img src=x onerror="alert(1)">');
+            return !result.includes('<img') && result.includes('&lt;');
+          }
+        },
+        {
+          name: '3. isValidUrl() - HTTP/HTTPS',
+          test: () => {
+            return isValidUrl('https://cba.org.br') &&
+                   !isValidUrl('javascript:alert(1)');
+          }
+        },
+        {
+          name: '4. isAllowedDomain() - Whitelist',
+          test: () => {
+            return isAllowedDomain('https://cba.org.br') &&
+                   !isAllowedDomain('https://evil.com');
+          }
+        },
+        {
+          name: '5. isValidEmail()',
+          test: () => {
+            return isValidEmail('test@example.com') &&
+                   !isValidEmail('invalid');
+          }
+        },
+        {
+          name: '6. localStorage Safety',
+          test: () => {
+            const data = { test: true };
+            localStorage.setItem('testKey', JSON.stringify(data));
+            const loaded = loadUserDataSafely('testKey', {});
+            localStorage.removeItem('testKey');
+            return loaded.test === true;
+          }
+        },
+        {
+          name: '7. createSafeElement()',
+          test: () => {
+            const maliciousContent = '<' + 'script>alert(1)</' + 'script>';
+            const elem = createSafeElement('div', maliciousContent);
+            return elem instanceof HTMLElement &&
+                   !elem.innerHTML.includes('<script>');
+          }
+        },
+        {
+          name: '8. SimpleRateLimiter',
+          test: () => {
+            const limiter = new SimpleRateLimiter(2, 1000);
+            const r1 = limiter.isAllowed('test');
+            const r2 = limiter.isAllowed('test');
+            const r3 = limiter.isAllowed('test');
+            return r1 && r2 && !r3;
+          }
+        },
+        {
+          name: '9. isValidPassword()',
+          test: () => {
+            return isValidPassword('123456') &&
+                   !isValidPassword('12345');
+          }
+        },
+        {
+          name: '10. fetchWithTimeout exists',
+          test: () => typeof fetchWithTimeout === 'function'
+        }
+      ];
+
+      let passed = 0;
+      let failed = 0;
+
+      tests.forEach((test, idx) => {
+        try {
+          const result = test.test();
+          const line = document.createElement('div');
+          line.className = 'result';
+
+          if (result) {
+            line.innerHTML = `<span class="pass">✅ ${test.name}</span>`;
+            passed++;
+          } else {
+            line.innerHTML = `<span class="fail">❌ ${test.name}</span>`;
+            failed++;
+          }
+          outputDiv.appendChild(line);
+        } catch (error) {
+          const line = document.createElement('div');
+          line.className = 'result';
+          line.innerHTML = `<span class="fail">❌ ${test.name}: ${error.message}</span>`;
+          outputDiv.appendChild(line);
+          failed++;
+        }
+      });
+
+      // Status final
+      const total = passed + failed;
+      const percentage = Math.round((passed / total) * 100);
+
+      statusDiv.innerHTML = `
+        <div class="${passed === total ? 'pass' : 'fail'}">
+          <strong>${passed}/${total} Testes Passaram (${percentage}%)</strong>
+        </div>
+        <div style="margin-top: 20px; color: #38bdf8;">
+          ${passed === total
+            ? '✅ PRONTO PARA NETLIFY!'
+            : '⚠️ Alguns testes falharam'}
+        </div>
+      `;
+
+      // Log no console
+      console.log(`\n🔒 TESTE DE SEGURANÇA`);
+      console.log(`Passaram: ${passed}/${total}`);
+      console.log(`Score: ${percentage}%`);
+      console.log(`Status: ${passed === total ? '✅ OK' : '❌ Falha'}\n`);
+    }
+
+    // Auto-run se necessário
+    console.log('🔒 Teste de Segurança Carregado');
+    console.log('Clique no botão "EXECUTAR TESTES" ou execute no console:');
+    console.log('runTests()');
+  </script>
+</body>
+</html>
