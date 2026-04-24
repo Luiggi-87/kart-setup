@@ -8,6 +8,7 @@
   <title>Kart Setup — Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="utils-security.js" defer></script>
   <script src="/js/security-config.js" defer></script>
 
   <style>
@@ -379,6 +380,7 @@
     <nav class="tab-bar" role="tablist">
       <button class="tab-btn active" data-tab="setups" role="tab" aria-selected="true">Setups</button>
       <button class="tab-btn" data-tab="telemetria" role="tab" aria-selected="false">Telemetria</button>
+      <button class="tab-btn" data-tab="testes" role="tab" aria-selected="false">🔒 Testes de Segurança</button>
     </nav>
 
     <!-- TAB: SETUPS -->
@@ -715,6 +717,42 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- TAB: TESTES DE SEGURANÇA -->
+    <div id="tab-testes" class="tab-panel" hidden>
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔒 Testes de Segurança</div>
+            <div class="panel-subtitle">Validação automática de funções de segurança do aplicativo</div>
+          </div>
+          <button class="btn" id="btn-run-security-tests">▶️ Executar Testes</button>
+        </div>
+
+        <div id="security-tests-output" style="margin-top: 16px;">
+          <div style="color: var(--text-soft); text-align: center; padding: 30px;">
+            Clique no botão acima para executar os testes de segurança
+          </div>
+        </div>
+
+        <div id="security-tests-summary" style="margin-top: 20px; display: none;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+            <article class="card">
+              <h3>Testes Passados</h3>
+              <div class="value" id="security-tests-passed" style="color: var(--accent);">0</div>
+            </article>
+            <article class="card">
+              <h3>Testes Falhados</h3>
+              <div class="value" id="security-tests-failed" style="color: var(--danger);">0</div>
+            </article>
+            <article class="card">
+              <h3>Score de Segurança</h3>
+              <div class="value" id="security-tests-score" style="color: var(--accent);">0%</div>
+            </article>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 
@@ -1355,6 +1393,7 @@
       });
       document.getElementById('tab-setups').hidden  = target !== 'setups';
       document.getElementById('tab-telemetria').hidden = target !== 'telemetria';
+      document.getElementById('tab-testes').hidden = target !== 'testes';
     }
 
     document.querySelector('.tab-bar').addEventListener('click', e => {
@@ -1362,6 +1401,134 @@
       if (!btn) return;
       switchTab(btn.dataset.tab);
     });
+
+    // ─── TESTES DE SEGURANÇA ───────────────────────────
+    const securityTests = [
+      {
+        name: '1. utils-security.js carregado',
+        test: () => typeof escapeHtml === 'function' && typeof openSafeLink === 'function'
+      },
+      {
+        name: '2. escapeHtml() - Prevenção de XSS',
+        test: () => {
+          const result = escapeHtml('<img src=x onerror="alert(1)">');
+          return !result.includes('<img') && result.includes('&lt;');
+        }
+      },
+      {
+        name: '3. isValidUrl() - HTTP/HTTPS apenas',
+        test: () => {
+          return isValidUrl('https://cba.org.br') &&
+                 !isValidUrl('javascript:alert(1)');
+        }
+      },
+      {
+        name: '4. isAllowedDomain() - Whitelist de domínios',
+        test: () => {
+          return isAllowedDomain('https://cba.org.br') &&
+                 !isAllowedDomain('https://evil.com');
+        }
+      },
+      {
+        name: '5. isValidEmail() - Validação de email',
+        test: () => {
+          return isValidEmail('test@example.com') &&
+                 !isValidEmail('invalid');
+        }
+      },
+      {
+        name: '6. localStorage - Carregamento seguro',
+        test: () => {
+          const data = { test: true };
+          localStorage.setItem('testKey', JSON.stringify(data));
+          const loaded = loadUserDataSafely('testKey', {});
+          localStorage.removeItem('testKey');
+          return loaded.test === true;
+        }
+      },
+      {
+        name: '7. createSafeElement() - Criação segura de DOM',
+        test: () => {
+          const maliciousContent = '<' + 'script>alert(1)</' + 'script>';
+          const elem = createSafeElement('div', maliciousContent);
+          return elem instanceof HTMLElement &&
+                 !elem.innerHTML.includes('<script>');
+        }
+      },
+      {
+        name: '8. SimpleRateLimiter - Rate limiting',
+        test: () => {
+          const limiter = new SimpleRateLimiter(2, 1000);
+          const r1 = limiter.isAllowed('test');
+          const r2 = limiter.isAllowed('test');
+          const r3 = limiter.isAllowed('test');
+          return r1 && r2 && !r3;
+        }
+      },
+      {
+        name: '9. isValidPassword() - Validação de senha',
+        test: () => {
+          return isValidPassword('123456') &&
+                 !isValidPassword('12345');
+        }
+      },
+      {
+        name: '10. fetchWithTimeout - Proteção de timeout',
+        test: () => typeof fetchWithTimeout === 'function'
+      }
+    ];
+
+    function runSecurityTests() {
+      const outputDiv = document.getElementById('security-tests-output');
+      const summaryDiv = document.getElementById('security-tests-summary');
+
+      outputDiv.innerHTML = '';
+      let passed = 0;
+      let failed = 0;
+
+      securityTests.forEach((testCase, idx) => {
+        try {
+          const result = testCase.test();
+          const itemDiv = document.createElement('div');
+          itemDiv.style.cssText = 'padding: 10px 12px; margin-bottom: 6px; border-radius: 8px; border-left: 3px solid; font-size: 12px; font-family: monospace;';
+
+          if (result) {
+            itemDiv.style.cssText += 'background: rgba(34, 197, 94, 0.1); border-left-color: var(--accent); color: var(--accent);';
+            itemDiv.textContent = `✅ ${testCase.name}`;
+            passed++;
+          } else {
+            itemDiv.style.cssText += 'background: rgba(249, 115, 115, 0.1); border-left-color: var(--danger); color: var(--danger);';
+            itemDiv.textContent = `❌ ${testCase.name}`;
+            failed++;
+          }
+          outputDiv.appendChild(itemDiv);
+        } catch (error) {
+          const itemDiv = document.createElement('div');
+          itemDiv.style.cssText = 'padding: 10px 12px; margin-bottom: 6px; border-radius: 8px; border-left: 3px solid var(--danger); background: rgba(249, 115, 115, 0.1); color: var(--danger); font-size: 12px; font-family: monospace;';
+          itemDiv.textContent = `❌ ${testCase.name}: ${error.message}`;
+          outputDiv.appendChild(itemDiv);
+          failed++;
+        }
+      });
+
+      // Mostrar resumo
+      const total = passed + failed;
+      const score = Math.round((passed / total) * 100);
+
+      document.getElementById('security-tests-passed').textContent = passed;
+      document.getElementById('security-tests-failed').textContent = failed;
+      document.getElementById('security-tests-score').textContent = score + '%';
+
+      summaryDiv.style.display = 'block';
+
+      // Log no console
+      console.log(`\n🔒 TESTES DE SEGURANÇA`);
+      console.log(`Passaram: ${passed}/${total}`);
+      console.log(`Score: ${score}%`);
+      console.log(`Status: ${passed === total ? '✅ OK' : '❌ Falha'}\n`);
+    }
+
+    document.getElementById('btn-run-security-tests').addEventListener('click', runSecurityTests);
 
     // ═══════════════════════════════════════════════════
     // MÓDULO DE TELEMETRIA
