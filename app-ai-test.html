@@ -883,6 +883,248 @@
       box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
     }
 
+    /* Calendário */
+    .calendario-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .calendario-filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .eventos-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .evento-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .evento-card:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .evento-card.destaque {
+      border: 2px solid var(--accent);
+      background: rgba(0, 255, 136, 0.08);
+    }
+
+    .evento-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .evento-titulo {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .evento-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(0, 255, 136, 0.2);
+      border-radius: 4px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .evento-info {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .evento-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .evento-desc {
+      font-size: 12px;
+      color: var(--text-softer);
+      line-height: 1.4;
+    }
+
+    /* Comunidade */
+    .comunidade-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .comunidade-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .comunidade-tab-btn {
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-soft);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .comunidade-tab-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .comunidade-tab-btn.active {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .comunidade-tab-content {
+      display: none;
+    }
+
+    .comunidade-tab-content.active {
+      display: block;
+    }
+
+    .setup-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .setup-card:hover {
+      background: rgba(0, 255, 136, 0.05);
+      border-color: var(--accent);
+    }
+
+    .setup-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .setup-card-title {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .setup-card-meta {
+      font-size: 11px;
+      color: var(--text-softer);
+      margin-bottom: 8px;
+    }
+
+    .setup-card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .setup-card-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--accent);
+      border-radius: 3px;
+      font-size: 10px;
+    }
+
+    .setup-card-desc {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.4;
+    }
+
+    .setup-card-rating {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .ranking-position {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .ranking-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .ranking-info h4 {
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .ranking-info small {
+      color: var(--text-softer);
+      font-size: 11px;
+    }
+
+    .ranking-score {
+      text-align: right;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
       .pistas-content {
@@ -949,6 +1191,8 @@
       <button class="tab-btn active" onclick="switchTab('inputs')">📝 Inputs</button>
       <button class="tab-btn" onclick="switchTab('analysis')">🔍 Análise</button>
       <button class="tab-btn" onclick="switchTab('pistas')">🏁 Pistas</button>
+      <button class="tab-btn" onclick="switchTab('calendario')">📅 Calendário</button>
+      <button class="tab-btn" onclick="switchTab('comunidade')">👥 Comunidade</button>
       <button class="tab-btn" onclick="switchTab('history')">📚 Histórico</button>
     </div>
 
@@ -1519,6 +1763,58 @@
       </div>
     </div>
 
+    <!-- Tab: Calendario -->
+    <div id="calendario" class="tab-content">
+      <div class="calendario-container">
+        <div style="margin-bottom: 20px;">
+          <h2 style="color: var(--accent); margin-bottom: 8px;">📅 Calendário CBK 2026</h2>
+          <p style="color: var(--text-soft); font-size: 13px;">Acompanhe os principais campeonatos e eventos de kartismo no Brasil</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="calendario-filters" style="margin-bottom: 20px;">
+          <input type="text" id="filtro-evento" placeholder="🔍 Buscar evento..." onkeyup="filterEventos()" style="padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; flex: 1;">
+        </div>
+
+        <!-- Lista de Eventos -->
+        <div id="eventosList" class="eventos-list">
+          <!-- Será preenchido por JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Comunidade -->
+    <div id="comunidade" class="tab-content">
+      <div class="comunidade-container">
+        <div style="margin-bottom: 20px;">
+          <h2 style="color: var(--accent); margin-bottom: 8px;">👥 Comunidade Kart Setup</h2>
+          <p style="color: var(--text-soft); font-size: 13px;">Compartilhe setups, dicas e experiências com outros pilotos</p>
+        </div>
+
+        <!-- Abas da Comunidade -->
+        <div class="comunidade-tabs" style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+          <button class="comunidade-tab-btn active" onclick="switchComunidadeTab('setups')">🏁 Setups Populares</button>
+          <button class="comunidade-tab-btn" onclick="switchComunidadeTab('dicas')">💡 Dicas & Truques</button>
+          <button class="comunidade-tab-btn" onclick="switchComunidadeTab('discuss')">💬 Discussões</button>
+          <button class="comunidade-tab-btn" onclick="switchComunidadeTab('rankings')">🏆 Rankings</button>
+        </div>
+
+        <!-- Conteúdo das abas da comunidade -->
+        <div id="setups-tab" class="comunidade-tab-content active">
+          <!-- Setups populares -->
+        </div>
+        <div id="dicas-tab" class="comunidade-tab-content" style="display: none;">
+          <!-- Dicas -->
+        </div>
+        <div id="discuss-tab" class="comunidade-tab-content" style="display: none;">
+          <!-- Discussões -->
+        </div>
+        <div id="rankings-tab" class="comunidade-tab-content" style="display: none;">
+          <!-- Rankings -->
+        </div>
+      </div>
+    </div>
+
     <!-- Tab: History -->
     <div id="history" class="tab-content">
       <div id="historyContent">
@@ -1578,6 +1874,15 @@
         // Initialize pistas if not already done
         if (allTracks.length === 0) {
           initializePistas();
+        }
+      } else if (tabName === 'calendario') {
+        initializeCalendario();
+      } else if (tabName === 'comunidade') {
+        // Initialize first tab of comunidade if not already loaded
+        const setupsTab = document.getElementById('setups-tab');
+        if (!setupsTab.dataset.loaded) {
+          renderSetups();
+          setupsTab.dataset.loaded = 'true';
         }
       }
     }
@@ -1934,6 +2239,190 @@
       'generic': { name: '⚙️ Padrão (Genérico)', group: 'Standard' }
     };
 
+    // Calendario de Eventos CBK 2026
+    const EVENTOS_CBK_2026 = [
+      {
+        id: 'sulamericano',
+        titulo: '2º Campeonato Sul-Americano de Kart 4 Tempos',
+        data: '21-24 de maio de 2026',
+        local: 'Circuito International Techspeed, Nova Santa Rita (RS)',
+        categoria: 'Internacional',
+        icon: '🌎',
+        destaque: true,
+        descricao: 'Com apoio da FIA. Reunirá pilotos de toda América do Sul em uma das pistas mais modernas da região.'
+      },
+      {
+        id: 'copa-brasil',
+        titulo: '27ª Copa Brasil de Kart',
+        data: '22 de julho - 1º de agosto de 2026',
+        local: 'Kartódromo Internacional de Imperatriz (MA)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Um dos principais campeonatos nacionais com participação de pilotos de todas as regiões do Brasil.'
+      },
+      {
+        id: 'birigui-fev',
+        titulo: 'Etapa Birigui - Fevereiro',
+        data: '28 de fevereiro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Primeira etapa da temporada no circuito de Birigui. Ótima oportunidade para treino e preparação.'
+      },
+      {
+        id: 'birigui-abr',
+        titulo: 'Etapa Birigui - Abril',
+        data: '25 de abril de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Segunda etapa da temporada em Birigui. Acompanhe a evolução dos pilotos.'
+      },
+      {
+        id: 'birigui-jun',
+        titulo: 'Etapa Birigui - Junho',
+        data: '20 de junho de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Terceira etapa. Competição acirrada entre os principais pilotos.'
+      },
+      {
+        id: 'birigui-jul',
+        titulo: 'Etapa Birigui - Julho',
+        data: '25 de julho de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Quarta etapa da temporada.'
+      },
+      {
+        id: 'birigui-set',
+        titulo: 'Etapa Birigui - Setembro',
+        data: '26 de setembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Quinta etapa da temporada.'
+      },
+      {
+        id: 'birigui-out',
+        titulo: 'Etapa Birigui - Outubro',
+        data: '24 de outubro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Estadual',
+        icon: '🏁',
+        descricao: 'Open do Brasileiro - Última etapa e oportunidade para se classificar para o nacional.'
+      },
+      {
+        id: 'brasileiro-g1',
+        titulo: '61º Brasileiro de Kart - Grupo 1',
+        data: '16-21 de novembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Grupo 1 do maior campeonato de kart do Brasil. Grande movimentação esperada.'
+      },
+      {
+        id: 'brasileiro-g2',
+        titulo: '61º Brasileiro de Kart - Grupo 2',
+        data: '23-28 de novembro de 2026',
+        local: 'Speed Park, Birigui (SP)',
+        categoria: 'Nacional',
+        icon: '🏆',
+        destaque: true,
+        descricao: 'Grupo 2 do Brasileiro. Finalizando a temporada em grande estilo.'
+      }
+    ];
+
+    // Setup Populares da Comunidade
+    const SETUPS_COMUNIDADE = [
+      {
+        titulo: 'Nova Odessa - Setup Balanceado para Iniciantes',
+        autor: 'Piloto BR',
+        pista: 'Nova Odessa',
+        categoria: 'Iniciante',
+        upvotes: 145,
+        descricao: 'Setup versátil que funciona bem em diferentes traçados. Ótimo para aprender os fundamentals.'
+      },
+      {
+        titulo: 'KGV - Configuração Agressiva para Experientes',
+        autor: 'Racer Elite',
+        pista: 'KGV',
+        categoria: 'Avançado',
+        upvotes: 203,
+        descricao: 'Setup agressivo focado em tempo de volta. Exige experiência e bom condicionamento físico.'
+      },
+      {
+        titulo: 'Velopark - Setup Chuva com Baixo Grip',
+        autor: 'Rain Master',
+        pista: 'Velopark',
+        categoria: 'Condição Especial',
+        upvotes: 87,
+        descricao: 'Configuração específica para pistas molhadas. Testada em várias condições.'
+      },
+      {
+        titulo: 'Recife - Setup Tropical para Quente e Úmido',
+        autor: 'Nordeste Kart',
+        pista: 'Recife',
+        categoria: 'Regional',
+        upvotes: 112,
+        descricao: 'Otimizado para o clima tropical do Nordeste. Excelente grip em asfaltos quentes.'
+      },
+      {
+        titulo: 'Uberlândia - Configuração Técnica Alta',
+        autor: 'Técnico Setup',
+        pista: 'Uberlândia',
+        categoria: 'Técnica Alta',
+        upvotes: 156,
+        descricao: 'Para a pista técnica de Uberlândia. Requer precisão nas freadas.'
+      }
+    ];
+
+    // Dicas e Truques
+    const DICAS_COMUNIDADE = [
+      {
+        titulo: 'Ajuste de Cambagem: O Guia Completo',
+        autor: 'Engineer Pro',
+        upvotes: 324,
+        descricao: 'Entenda como a cambagem afeta o grip, o desgaste de pneu e o comportamento do kart em diferentes situações.'
+      },
+      {
+        titulo: 'Pressão de Pneu: Quando e Por Quê Ajustar',
+        autor: 'Tire Specialist',
+        upvotes: 287,
+        descricao: 'Descubra como encontrar a pressão ideal de acordo com a temperatura, asfalto e estilo de pilotagem.'
+      },
+      {
+        titulo: 'Para-choques: Rigidez e Altura',
+        autor: 'Setup Master',
+        upvotes: 256,
+        descricao: 'Saiba como os para-choques afetam a absorção de impacto e o comportamento em curvas rápidas.'
+      },
+      {
+        titulo: 'Condicionamento Físico para Kartistas',
+        autor: 'Fitness Coach',
+        upvotes: 198,
+        descricao: 'Exercícios específicos para melhorar resistência, força e precisão no kart.'
+      }
+    ];
+
+    // Rankings Locais
+    const RANKINGS_COMUNIDADE = [
+      { posicao: 1, nome: 'Piloto Campeão', pista: 'Nova Odessa', pontos: 2850 },
+      { posicao: 2, nome: 'Racer Elite', pista: 'KGV', pontos: 2720 },
+      { posicao: 3, nome: 'Técnico Setup', pista: 'Uberlândia', pontos: 2640 },
+      { posicao: 4, nome: 'Rain Master', pista: 'Velopark', pontos: 2510 },
+      { posicao: 5, nome: 'Nordeste Kart', pista: 'Recife', pontos: 2390 },
+      { posicao: 6, nome: 'Speed Demon', pista: 'Birigui', pontos: 2265 },
+      { posicao: 7, nome: 'Grip Hunter', pista: 'Betim', pontos: 2140 },
+      { posicao: 8, nome: 'Setup Wizard', pista: 'Nova Odessa', pontos: 2015 },
+      { posicao: 9, nome: 'Turbo Pilot', pista: 'São Paulo', pontos: 1890 },
+      { posicao: 10, nome: 'Drift King', pista: 'Brasília', pontos: 1765 }
+    ];
+
     function openSetupWizard(trackId) {
       const track = allTracks.find(t => t.id === trackId);
       if (!track || !track.setup_recommendations) {
@@ -2177,6 +2666,165 @@
       if (field && value !== null && value !== undefined) {
         field.value = value;
       }
+    }
+
+    // Calendario Functions
+    function initializeCalendario() {
+      renderEventos(EVENTOS_CBK_2026);
+    }
+
+    function renderEventos(eventos) {
+      const listContainer = document.getElementById('eventosList');
+
+      if (eventos.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state-icon">📭</div><p>Nenhum evento encontrado</p></div>';
+        return;
+      }
+
+      let html = '';
+      eventos.forEach(evento => {
+        const destaqueClass = evento.destaque ? 'destaque' : '';
+        html += `
+          <div class="evento-card ${destaqueClass}">
+            <div class="evento-header">
+              <div class="evento-titulo">${evento.icon} ${evento.titulo}</div>
+              <span class="evento-badge">${evento.categoria}</span>
+            </div>
+            <div class="evento-info">
+              <div class="evento-info-item">📅 ${evento.data}</div>
+              <div class="evento-info-item">📍 ${evento.local}</div>
+            </div>
+            <div class="evento-desc">${evento.descricao}</div>
+          </div>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+    }
+
+    function filterEventos() {
+      const searchTerm = document.getElementById('filtro-evento').value.toLowerCase();
+      const filtered = EVENTOS_CBK_2026.filter(e =>
+        e.titulo.toLowerCase().includes(searchTerm) ||
+        e.local.toLowerCase().includes(searchTerm) ||
+        e.categoria.toLowerCase().includes(searchTerm)
+      );
+      renderEventos(filtered);
+    }
+
+    // Comunidade Functions
+    function switchComunidadeTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.comunidade-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+      });
+
+      // Remove active from all buttons
+      document.querySelectorAll('.comunidade-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      const tabElement = document.getElementById(tabName + '-tab');
+      if (tabElement) {
+        tabElement.classList.add('active');
+        tabElement.style.display = 'block';
+        event.target.classList.add('active');
+      }
+
+      // Load content if first time
+      if (tabName === 'setups' && !tabElement.dataset.loaded) {
+        renderSetups();
+        tabElement.dataset.loaded = 'true';
+      } else if (tabName === 'dicas' && !tabElement.dataset.loaded) {
+        renderDicas();
+        tabElement.dataset.loaded = 'true';
+      } else if (tabName === 'discuss' && !tabElement.dataset.loaded) {
+        renderDiscussoes();
+        tabElement.dataset.loaded = 'true';
+      } else if (tabName === 'rankings' && !tabElement.dataset.loaded) {
+        renderRankings();
+        tabElement.dataset.loaded = 'true';
+      }
+    }
+
+    function renderSetups() {
+      const container = document.getElementById('setups-tab');
+      let html = '';
+      SETUPS_COMUNIDADE.forEach(setup => {
+        html += `
+          <div class="setup-card">
+            <div class="setup-card-header">
+              <div class="setup-card-title">${setup.titulo}</div>
+              <span style="color: var(--text-softer); font-size: 11px;">por ${setup.autor}</span>
+            </div>
+            <div class="setup-card-meta">
+              📍 ${setup.pista} • ${setup.categoria}
+            </div>
+            <div class="setup-card-tags">
+              <span class="setup-card-tag">🏁 ${setup.pista}</span>
+              <span class="setup-card-tag">📊 ${setup.categoria}</span>
+            </div>
+            <div class="setup-card-desc">${setup.descricao}</div>
+            <div class="setup-card-rating">
+              👍 ${setup.upvotes} curtidas
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderDicas() {
+      const container = document.getElementById('dicas-tab');
+      let html = '';
+      DICAS_COMUNIDADE.forEach(dica => {
+        html += `
+          <div class="setup-card">
+            <div class="setup-card-header">
+              <div class="setup-card-title">💡 ${dica.titulo}</div>
+              <span style="color: var(--text-softer); font-size: 11px;">por ${dica.autor}</span>
+            </div>
+            <div class="setup-card-desc">${dica.descricao}</div>
+            <div class="setup-card-rating">
+              👍 ${dica.upvotes} curtidas
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderDiscussoes() {
+      const container = document.getElementById('discuss-tab');
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">💬</div>
+          <p>Seção de discussões em desenvolvimento</p>
+          <p style="font-size: 12px; margin-top: 8px; color: var(--text-softer);">Em breve você poderá criar tópicos e debater sobre setups com a comunidade</p>
+        </div>
+      `;
+    }
+
+    function renderRankings() {
+      const container = document.getElementById('rankings-tab');
+      let html = '';
+      RANKINGS_COMUNIDADE.forEach(rank => {
+        html += `
+          <div class="ranking-item">
+            <div class="ranking-position">
+              <div class="ranking-number">${rank.posicao}</div>
+              <div class="ranking-info">
+                <h4>${rank.nome}</h4>
+                <small>📍 ${rank.pista}</small>
+              </div>
+            </div>
+            <div class="ranking-score">${rank.pontos}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
     function initializePistas() {
