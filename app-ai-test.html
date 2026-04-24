@@ -1125,6 +1125,223 @@
       font-size: 14px;
     }
 
+    /* Perfil */
+    .perfil-container {
+      padding: 20px;
+      background: rgba(5, 8, 18, 0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .perfil-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .perfil-avatar {
+      font-size: 48px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 2px solid var(--accent);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .perfil-info h2 {
+      color: var(--accent);
+      margin: 0 0 4px 0;
+      font-size: 18px;
+    }
+
+    .perfil-info p {
+      color: var(--text-soft);
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .perfil-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .perfil-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .perfil-section h3 {
+      color: var(--accent);
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+
+    .badges-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 12px;
+    }
+
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .badge-item:hover {
+      background: rgba(0, 255, 136, 0.2);
+      transform: scale(1.05);
+    }
+
+    .badge-item.locked {
+      opacity: 0.5;
+      background: rgba(100, 100, 100, 0.1);
+      border-color: var(--text-softer);
+    }
+
+    .badge-icon {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .badge-name {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .badge-item.locked .badge-name {
+      color: var(--text-softer);
+    }
+
+    /* Notificações */
+    #notificacoesPanel {
+      display: none !important;
+    }
+
+    #notificacoesPanel.active {
+      display: block !important;
+    }
+
+    .notificacao-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .notificacao-item.nao-lida {
+      background: rgba(0, 255, 136, 0.05);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .notificacao-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Comentários */
+    .comentarios-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .comentarios-section h4 {
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .comentario-item {
+      padding: 8px;
+      background: rgba(0, 255, 136, 0.03);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .comentario-autor {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .comentario-texto {
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .comentario-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .comentario-form input {
+      flex: 1;
+      padding: 6px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .comentario-form button {
+      padding: 6px 12px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
       .pistas-content {
@@ -1193,7 +1410,9 @@
       <button class="tab-btn" onclick="switchTab('pistas')">🏁 Pistas</button>
       <button class="tab-btn" onclick="switchTab('calendario')">📅 Calendário</button>
       <button class="tab-btn" onclick="switchTab('comunidade')">👥 Comunidade</button>
+      <button class="tab-btn" onclick="switchTab('perfil')">👤 Perfil</button>
       <button class="tab-btn" onclick="switchTab('history')">📚 Histórico</button>
+      <button id="notificacoes-btn" onclick="toggleNotificacoes()" style="position: relative; margin-left: auto;">🔔 Notificações <span id="notif-badge" style="position: absolute; top: -5px; right: -10px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">0</span></button>
     </div>
 
     <!-- Tab: Inputs -->
@@ -1733,6 +1952,52 @@
       </div>
     </div>
 
+    <!-- Modal: Criar Novo Post -->
+    <div id="createPostModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+      <div style="background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <h2 style="color: var(--accent); margin-bottom: 16px;">📝 Criar Novo Setup/Dica</h2>
+
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="postTitulo" placeholder="Ex: Setup Balanceado para Nova Odessa" style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); margin-bottom: 12px;">
+        </div>
+
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="postTipo" style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); margin-bottom: 12px;">
+            <option value="setup">🏁 Setup</option>
+            <option value="dica">💡 Dica & Truque</option>
+            <option value="discussao">💬 Discussão</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Pista (opcional)</label>
+          <input type="text" id="postPista" placeholder="Ex: Nova Odessa" style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); margin-bottom: 12px;">
+        </div>
+
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="postDescricao" placeholder="Descreva seu setup ou dica..." style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); min-height: 100px; margin-bottom: 12px; font-family: inherit;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button onclick="createPost()" class="btn btn-primary" style="flex: 1;">📤 Publicar</button>
+          <button onclick="closeCreatePostModal()" class="btn btn-secondary" style="flex: 1;">✕ Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Notificações -->
+    <div id="notificacoesPanel" style="display: none; position: fixed; top: 70px; right: 20px; width: 350px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); z-index: 999; max-height: 400px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+      <div style="padding: 16px; border-bottom: 1px solid var(--border);">
+        <h3 style="color: var(--accent); font-size: 14px; margin: 0;">🔔 Notificações</h3>
+      </div>
+      <div id="notificacoesList" style="padding: 12px;">
+        <!-- Será preenchido dinamicamente -->
+      </div>
+    </div>
+
     <!-- Modal: Setup Wizard (Track Condition + Kart Model) -->
     <div id="setupWizardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
       <div style="background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
@@ -1815,6 +2080,54 @@
       </div>
     </div>
 
+    <!-- Tab: Perfil -->
+    <div id="perfil" class="tab-content">
+      <div class="perfil-container">
+        <div class="perfil-header">
+          <div class="perfil-avatar">👤</div>
+          <div class="perfil-info">
+            <h2 id="perfilNome">Piloto Anônimo</h2>
+            <p id="perfilEmail">sem-email@exemplo.com</p>
+          </div>
+          <button class="btn btn-secondary" onclick="editarPerfil()" style="position: absolute; top: 20px; right: 20px;">✏️ Editar</button>
+        </div>
+
+        <div class="perfil-stats">
+          <div class="stat-card">
+            <div class="stat-number" id="statSetups">0</div>
+            <div class="stat-label">Setups Criados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statPontos">0</div>
+            <div class="stat-label">Pontos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statBadges">0</div>
+            <div class="stat-label">Badges</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statAnalises">0</div>
+            <div class="stat-label">Análises Feitas</div>
+          </div>
+        </div>
+
+        <div class="perfil-section">
+          <h3>🏅 Suas Conquistas</h3>
+          <div id="badgesList" class="badges-list">
+            <!-- Será preenchido dinamicamente -->
+          </div>
+        </div>
+
+        <div class="perfil-section">
+          <h3>📝 Seus Posts</h3>
+          <button class="btn btn-primary" onclick="openCreatePostModal()" style="margin-bottom: 16px;">+ Criar Novo Post</button>
+          <div id="meusPosts" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Será preenchido dinamicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab: History -->
     <div id="history" class="tab-content">
       <div id="historyContent">
@@ -1884,6 +2197,8 @@
           renderSetups();
           setupsTab.dataset.loaded = 'true';
         }
+      } else if (tabName === 'perfil') {
+        initializePerfil();
       }
     }
 
@@ -2009,6 +2324,12 @@
 
         // Save to history
         saveToHistory(currentAnalysis);
+
+        // Update user data
+        userData.analisesFeitass++;
+        userData.pontos += 15;
+        saveUserData();
+        addNotificacao('📊 Você completou uma análise! +15 pontos', 'achievement');
 
         // Display results
         displayAnalysis(currentAnalysis);
@@ -2422,6 +2743,310 @@
       { posicao: 9, nome: 'Turbo Pilot', pista: 'São Paulo', pontos: 1890 },
       { posicao: 10, nome: 'Drift King', pista: 'Brasília', pontos: 1765 }
     ];
+
+    // Badges e Conquistas
+    const BADGES = [
+      { id: 'primeira-analise', icon: '🚀', nome: 'Primeiro Setup', desc: 'Criar primeiro setup', condicao: () => userData.setupsCriados >= 1 },
+      { id: 'setup-master', icon: '🏆', nome: 'Setup Master', desc: '5 setups criados', condicao: () => userData.setupsCriados >= 5 },
+      { id: 'analista', icon: '🔍', nome: 'Analista', desc: '10 análises feitas', condicao: () => userData.analisesFeitass >= 10 },
+      { id: 'community-lover', icon: '💛', nome: 'Community Lover', desc: '50 pontos acumulados', condicao: () => userData.pontos >= 50 },
+      { id: 'karista', icon: '🏎️', nome: 'Kartista Pro', desc: 'Visitar 5 pistas diferentes', condicao: () => userData.pistasVisitadas >= 5 },
+      { id: 'knowledge-sharer', icon: '📚', nome: 'Compartilhador', desc: 'Publicar 3 dicas', condicao: () => userData.dicas >= 3 },
+      { id: 'social-butterfly', icon: '🦋', nome: 'Social Butterfly', desc: '100 pontos em comentários', condicao: () => userData.pontosComentarios >= 100 },
+      { id: 'streak-master', icon: '🔥', nome: 'Consistência', desc: 'Usar app 7 dias seguidos', condicao: () => userData.diasConsecutivos >= 7 }
+    ];
+
+    // User Data (localStorage)
+    let userData = {
+      nome: 'Piloto Anônimo',
+      email: 'sem-email@exemplo.com',
+      setupsCriados: 0,
+      analisesFeitass: 0,
+      pontos: 0,
+      pistasVisitadas: [],
+      dicas: 0,
+      pontosComentarios: 0,
+      diasConsecutivos: 0,
+      posts: [],
+      notificacoes: [],
+      badgesDesbloqueadas: []
+    };
+
+    // Carregar user data do localStorage
+    function loadUserData() {
+      const saved = localStorage.getItem('userDataKartSetup');
+      if (saved) {
+        userData = JSON.parse(saved);
+      } else {
+        saveUserData();
+      }
+    }
+
+    // Salvar user data no localStorage
+    function saveUserData() {
+      localStorage.setItem('userDataKartSetup', JSON.stringify(userData));
+    }
+
+    // Adicionar notificação
+    function addNotificacao(mensagem, tipo = 'info') {
+      const notif = {
+        id: Date.now(),
+        mensagem: mensagem,
+        tipo: tipo,
+        lida: false,
+        data: new Date().toLocaleString('pt-BR')
+      };
+      userData.notificacoes.unshift(notif);
+      if (userData.notificacoes.length > 20) userData.notificacoes.pop();
+      saveUserData();
+      updateNotificacoesBadge();
+    }
+
+    // Atualizar badge de notificações
+    function updateNotificacoesBadge() {
+      const naoLidas = userData.notificacoes.filter(n => !n.lida).length;
+      document.getElementById('notif-badge').textContent = naoLidas;
+      document.getElementById('notif-badge').style.display = naoLidas > 0 ? 'flex' : 'none';
+    }
+
+    // Alternar painel de notificações
+    function toggleNotificacoes() {
+      const panel = document.getElementById('notificacoesPanel');
+      panel.classList.toggle('active');
+      if (panel.classList.contains('active')) {
+        renderNotificacoes();
+        userData.notificacoes.forEach(n => n.lida = true);
+        saveUserData();
+        updateNotificacoesBadge();
+      }
+    }
+
+    // Renderizar notificações
+    function renderNotificacoes() {
+      const container = document.getElementById('notificacoesList');
+      if (userData.notificacoes.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-softer); font-size: 12px; padding: 12px;">Nenhuma notificação</div>';
+        return;
+      }
+      let html = '';
+      userData.notificacoes.forEach(notif => {
+        html += `
+          <div class="notificacao-item ${!notif.lida ? 'nao-lida' : ''}">
+            <strong>${notif.tipo === 'event' ? '📅' : '🔔'} ${notif.mensagem}</strong>
+            <div style="font-size: 10px; margin-top: 4px; color: var(--text-softer);">${notif.data}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // Abrir modal de criar post
+    function openCreatePostModal() {
+      document.getElementById('createPostModal').style.display = 'flex';
+    }
+
+    // Fechar modal de criar post
+    function closeCreatePostModal() {
+      document.getElementById('createPostModal').style.display = 'none';
+      document.getElementById('postTitulo').value = '';
+      document.getElementById('postDescricao').value = '';
+      document.getElementById('postPista').value = '';
+    }
+
+    // Criar novo post
+    function createPost() {
+      const titulo = document.getElementById('postTitulo').value.trim();
+      const tipo = document.getElementById('postTipo').value;
+      const pista = document.getElementById('postPista').value.trim();
+      const descricao = document.getElementById('postDescricao').value.trim();
+
+      if (!titulo || !descricao) {
+        showMessage('⚠️ Por favor, preencha título e descrição', 'warning');
+        return;
+      }
+
+      const post = {
+        id: Date.now(),
+        titulo: titulo,
+        tipo: tipo,
+        pista: pista,
+        descricao: descricao,
+        autor: userData.nome,
+        data: new Date().toLocaleString('pt-BR'),
+        upvotes: 0,
+        comentarios: []
+      };
+
+      userData.posts.unshift(post);
+      userData.setupsCriados++;
+      userData.pontos += (tipo === 'setup' ? 10 : 5);
+
+      if (tipo === 'dica') userData.dicas++;
+
+      saveUserData();
+      closeCreatePostModal();
+      showMessage(`✅ ${tipo === 'setup' ? 'Setup' : 'Dica'} publicado com sucesso!`, 'success');
+      addNotificacao(`Você publicou um novo ${tipo}!`, 'user');
+
+      // Atualizar comunidade se estiver naquela aba
+      if (document.getElementById('setups-tab').style.display !== 'none') {
+        renderSetups();
+      }
+    }
+
+    // Renderizar setups com posts do usuário
+    function renderSetups() {
+      const container = document.getElementById('setups-tab');
+      let html = '';
+
+      // Posts do usuário
+      if (userData.posts.filter(p => p.tipo === 'setup').length > 0) {
+        html += '<h4 style="color: var(--accent); margin-bottom: 12px;">📝 Meus Setups</h4>';
+        userData.posts.filter(p => p.tipo === 'setup').forEach(post => {
+          html += renderPostCard(post);
+        });
+        html += '<hr style="margin: 16px 0; border: none; border-top: 1px solid var(--border);">';
+      }
+
+      // Setups da comunidade
+      html += '<h4 style="color: var(--accent); margin-bottom: 12px;">🏁 Setups da Comunidade</h4>';
+      SETUPS_COMUNIDADE.forEach(setup => {
+        html += `
+          <div class="setup-card">
+            <div class="setup-card-header">
+              <div class="setup-card-title">${setup.titulo}</div>
+              <span style="color: var(--text-softer); font-size: 11px;">por ${setup.autor}</span>
+            </div>
+            <div class="setup-card-meta">
+              📍 ${setup.pista} • ${setup.categoria}
+            </div>
+            <div class="setup-card-tags">
+              <span class="setup-card-tag">🏁 ${setup.pista}</span>
+              <span class="setup-card-tag">📊 ${setup.categoria}</span>
+            </div>
+            <div class="setup-card-desc">${setup.descricao}</div>
+            <div class="setup-card-rating">
+              👍 ${setup.upvotes} curtidas
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // Renderizar card de post
+    function renderPostCard(post) {
+      return `
+        <div class="setup-card">
+          <div class="setup-card-header">
+            <div class="setup-card-title">${post.titulo}</div>
+            <span style="color: var(--text-softer); font-size: 11px;">por ${post.autor}</span>
+          </div>
+          <div class="setup-card-meta">
+            ${post.pista ? `📍 ${post.pista} • ` : ''}${post.data}
+          </div>
+          <div class="setup-card-desc">${post.descricao}</div>
+          <div class="setup-card-rating">
+            👍 ${post.upvotes} curtidas • 💬 ${post.comentarios.length} comentários
+          </div>
+          <div class="comentarios-section">
+            <div style="font-size: 11px; color: var(--text-softer);">
+              ${post.comentarios.map(c => `<div class="comentario-item"><span class="comentario-autor">${c.autor}:</span> <span class="comentario-texto">${c.texto}</span></div>`).join('')}
+            </div>
+            <div class="comentario-form">
+              <input type="text" placeholder="Deixe um comentário..." onkeypress="if(event.key==='Enter') adicionarComentario(${post.id}, this.value, this)">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Adicionar comentário
+    function adicionarComentario(postId, texto, input) {
+      if (!texto.trim()) return;
+
+      const post = userData.posts.find(p => p.id === postId);
+      if (post) {
+        post.comentarios.push({
+          autor: userData.nome,
+          texto: texto.trim()
+        });
+        userData.pontosComentarios += 5;
+        userData.pontos += 5;
+        saveUserData();
+        input.value = '';
+        renderSetups();
+      }
+    }
+
+    // Inicializar perfil
+    function initializePerfil() {
+      loadUserData();
+      updateUserProfile();
+      renderMeusPosts();
+      renderBadges();
+    }
+
+    // Atualizar perfil do usuário
+    function updateUserProfile() {
+      document.getElementById('perfilNome').textContent = userData.nome;
+      document.getElementById('perfilEmail').textContent = userData.email;
+      document.getElementById('statSetups').textContent = userData.setupsCriados;
+      document.getElementById('statPontos').textContent = userData.pontos;
+      document.getElementById('statBadges').textContent = userData.badgesDesbloqueadas.length;
+      document.getElementById('statAnalises').textContent = userData.analisesFeitass;
+    }
+
+    // Renderizar meus posts
+    function renderMeusPosts() {
+      const container = document.getElementById('meusPosts');
+      if (userData.posts.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-softer); font-size: 12px; padding: 12px;">Você ainda não publicou nenhum post. <a href="#" onclick="openCreatePostModal(); return false;" style="color: var(--accent);">Crie um agora!</a></div>';
+        return;
+      }
+      let html = '';
+      userData.posts.forEach(post => {
+        html += renderPostCard(post);
+      });
+      container.innerHTML = html;
+    }
+
+    // Renderizar badges
+    function renderBadges() {
+      const container = document.getElementById('badgesList');
+      let html = '';
+
+      BADGES.forEach(badge => {
+        const desbloqueado = badge.condicao();
+        const locked = desbloqueado ? '' : 'locked';
+
+        if (desbloqueado && !userData.badgesDesbloqueadas.includes(badge.id)) {
+          userData.badgesDesbloqueadas.push(badge.id);
+          addNotificacao(`🏅 Você desbloqueou a badge "${badge.nome}"!`, 'achievement');
+          saveUserData();
+        }
+
+        html += `
+          <div class="badge-item ${locked}" title="${badge.desc}">
+            <div class="badge-icon">${badge.icon}</div>
+            <div class="badge-name">${badge.nome}</div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Editar perfil
+    function editarPerfil() {
+      const novoNome = prompt('Digite seu nome:', userData.nome);
+      if (novoNome && novoNome.trim()) {
+        userData.nome = novoNome.trim();
+        saveUserData();
+        updateUserProfile();
+        showMessage('✅ Perfil atualizado!', 'success');
+      }
+    }
 
     function openSetupWizard(trackId) {
       const track = allTracks.find(t => t.id === trackId);
@@ -3055,6 +3680,18 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+      // Load user data
+      loadUserData();
+      updateNotificacoesBadge();
+
+      // Adicionar notificações de eventos em breve
+      const proximosEventos = EVENTOS_CBK_2026.slice(0, 3);
+      if (userData.notificacoes.length === 0) {
+        proximosEventos.forEach(evento => {
+          addNotificacao(`📅 ${evento.titulo} - ${evento.data}`, 'event');
+        });
+      }
+
       loadSampleSetup();
       // Initialize pistas when database is ready
       if (typeof KART_TRACKS_DATABASE !== 'undefined') {
