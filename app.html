@@ -375,10 +375,19 @@
       </div>
     </header>
 
-    <!-- TAB BAR -->
+    <!-- MAIN NAV BAR -->
+    <nav class="tab-bar" role="tablist" style="border-bottom: 2px solid var(--border); padding-bottom: 0;">
+      <a href="app.html" class="tab-btn active" style="text-decoration: none;">📊 Setups</a>
+      <a href="perfil.html" class="tab-btn" style="text-decoration: none;">👤 Perfil</a>
+      <a href="comunidade.html" class="tab-btn" style="text-decoration: none;">👥 Comunidade</a>
+      <a href="calendario.html" class="tab-btn" style="text-decoration: none;">📅 Calendário</a>
+      <a href="app-ai-test.html" class="tab-btn" style="text-decoration: none;">🤖 Análise de IA</a>
+    </nav>
+
+    <!-- INTERNAL TAB BAR (for Setups and Telemetria) -->
     <nav class="tab-bar" role="tablist">
-      <button class="tab-btn active" data-tab="setups" role="tab" aria-selected="true">Setups</button>
-      <button class="tab-btn" data-tab="telemetria" role="tab" aria-selected="false">Telemetria</button>
+      <button class="tab-btn active" data-tab="setups" role="tab" aria-selected="true">📋 Setups</button>
+      <button class="tab-btn" data-tab="telemetria" role="tab" aria-selected="false">📊 Telemetria</button>
     </nav>
 
     <!-- TAB: SETUPS -->
