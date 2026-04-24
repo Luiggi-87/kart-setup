@@ -14,7 +14,9 @@
       "mcp__scheduled-tasks__create_scheduled_task",
       "mcp__scheduled-tasks__update_scheduled_task",
       "Bash(cat)",
-      "Read(//c/Users/Luiggi G. Loureiro/OneDrive - Launch Digital/Desktop/Kart Republic/**)"
+      "Read(//c/Users/Luiggi G. Loureiro/OneDrive - Launch Digital/Desktop/Kart Republic/**)",
+      "Bash(gh repo *)",
+      "Bash(find . -name \"*.html\" -type f ! -path \"./.git/*\" -exec sed -i 's/app-ai-test\\\\.html/ai-analysis.html/g' {} \\\\;)"
     ]
   }
 }
