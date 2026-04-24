@@ -2810,7 +2810,8 @@
     }
 
     // Alternar painel de notificações
-    function toggleNotificacoes() {
+    function toggleNotificacoes(event) {
+      event.stopPropagation();
       const panel = document.getElementById('notificacoesPanel');
       panel.classList.toggle('active');
       if (panel.classList.contains('active')) {
@@ -2818,6 +2819,24 @@
         userData.notificacoes.forEach(n => n.lida = true);
         saveUserData();
         updateNotificacoesBadge();
+
+        // Fechar ao clicar fora
+        setTimeout(() => {
+          document.addEventListener('click', closeNotificacoesOnClickOutside);
+        }, 100);
+      } else {
+        document.removeEventListener('click', closeNotificacoesOnClickOutside);
+      }
+    }
+
+    // Fechar notificações ao clicar fora
+    function closeNotificacoesOnClickOutside(e) {
+      const panel = document.getElementById('notificacoesPanel');
+      const btn = document.getElementById('notificacoes-btn');
+
+      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('active');
+        document.removeEventListener('click', closeNotificacoesOnClickOutside);
       }
     }
 
